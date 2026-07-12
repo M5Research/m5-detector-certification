@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "artifact": "vr_detector_contingent_mi",
+  "data_span": {
+    "symbol": "BTCUSDT",
+    "start": "2021-05-29",
+    "end": "2025-12-31",
+    "n_bars": 2415148,
+    "first_ts": "2021-05-29T19:32:00+00:00",
+    "last_ts": "2025-12-31T23:59:00+00:00",
+    "bar_frequency": "1min",
+    "downsampled": false,
+    "window_policy": "contiguous_time_domain_truncation_no_downsampling",
+    "q_units": "bars_at_native_1min_frequency",
+    "requested_start": "2021-01-01",
+    "requested_end": "2025-12-31",
+    "year_2026_loaded": false
+  },
+  "detector": {
+    "name": "holm_corrected_vr_cascade_trigger",
+    "W": 120,
+    "q_grid": [
+      2,
+      5,
+      15,
+      60
+    ],
+    "label": "D_t(q)=1 iff the q-specific M2 z-statistic is positive and its two-sided p-value survives the frozen Holm four-q family.",
+    "decision_sampling": "non_overlapping_stride_W",
+    "soft_outputs_used": false
+  },
+  "time_local_detector_mi": {
+    "2": {
+      "n": 20126,
+      "mi_nats": 0.0001281962433680653,
+      "bootstrap_ci_nats": [
+        2.0620553702152588e-05,
+        0.0004459861924951637
+      ],
+      "permutation_p": 0.052947052947052944,
+      "gross_bound_bps": 1.281962433680653,
+      "cost_bps": 10.0,
+      "net_bound_bps": -8.718037566319348,
+      "conditional_forward_return": {
+        "0": {
+          "n": 20052,
+          "mean": -1.1355744962170918e-06,
+          "median": 0.0,
+          "positive_fraction": 0.49630959505286254
+        },
+        "1": {
+          "n": 74,
+          "mean": -0.0001733967664057779,
+          "median": -7.486085910193371e-05,
+          "positive_fraction": 0.3783783783783784
+        }
+      },
+      "target_q": 2,
+      "forward_horizon": 2,
+      "W": 120,
+      "stride": 120,
+      "q_grid": [
+        2,
+        5,
+        15,
+        60
+      ],
+      "alpha": 0.05,
+      "n_labels": 20126,
+      "n_triggers": 74,
+      "trigger_rate": 0.003676835933618205,
+      "label_entropy_nats": 0.024281317183086484,
+      "first_label_ts": "2021-05-29T21:31:00+00:00",
+      "last_label_ts": "2025-12-31T23:31:00+00:00"
+    },
+    "5": {
+      "n": 20126,
+      "mi_nats": 0.00034635793953663517,
+      "bootstrap_ci_nats": [
+        3.7846361130792245e-05,
+        0.0010333800205151434
+      ],
+      "permutation_p": 0.000999000999000999,
+      "gross_bound_bps": 3.463579395366352,
+      "cost_bps": 10.0,
+      "net_bound_bps": -6.536420604633648,
+      "conditional_forward_return": {
+        "0": {
+          "n": 20011,
+          "mean": -2.2168493632170525e-05,
+          "median": -1.0864950987479218e-05,
+          "positive_fraction": 0.4937284493528559
+        },
+        "1": {
+          "n": 115,
+          "mean": -0.00013297403439142333,
+          "median": -5.265038266764869e-05,
+          "positive_fraction": 0.4260869565217391
+        }
+      },
+      "target_q": 5,
+      "forward_horizon": 5,
+      "W": 120,
+      "stride": 120,
+      "q_grid": [
+        2,
+        5,
+        15,
+        60
+      ],
+      "alpha": 0.05,
+      "n_labels": 20126,
+      "n_triggers": 115,
+      "trigger_rate": 0.005714001788730994,
+      "label_entropy_nats": 0.03520952590976466,
+      "first_label_ts": "2021-05-29T21:31:00+00:00",
+      "last_label_ts": "2025-12-31T23:31:00+00:00"
+    }
+  },
+  "monte_carlo_cell_trigger_entropy": [
+    {
+      "path": "C:/Users/dfua1/OneDrive/Documents/Coding/M5 Research/VolRegime-Engine/data/injection_runs/inj_d0.15_q2_W120.json",
+      "W": 120,
+      "q": 2,
+      "delta_target": 0.15,
+      "N_mc": 200,
+      "n_draws": 200,
+      "n_fires": 200,
+      "P_det": 1.0,
+      "trigger_entropy_nats": 0.0,
+      "mi_upper_bound_nats": 0.0,
+      "mi_nats_if_conditioning_within_saturated_cell": 0.0,
+      "note": "Within-cell path-level trigger MI is bounded by H(D). A saturated 0/200 or 200/200 cell has H(D)=0 and therefore MI=0."
+    },
+    {
+      "path": "C:/Users/dfua1/OneDrive/Documents/Coding/M5 Research/VolRegime-Engine/data/injection_runs/inj_d0.15_q5_W120.json",
+      "W": 120,
+      "q": 5,
+      "delta_target": 0.15,
+      "N_mc": 200,
+      "n_draws": 200,
+      "n_fires": 0,
+      "P_det": 0.0,
+      "trigger_entropy_nats": 0.0,
+      "mi_upper_bound_nats": 0.0,
+      "mi_nats_if_conditioning_within_saturated_cell": 0.0,
+      "note": "Within-cell path-level trigger MI is bounded by H(D). A saturated 0/200 or 200/200 cell has H(D)=0 and therefore MI=0."
+    },
+    {
+      "path": "C:/Users/dfua1/OneDrive/Documents/Coding/M5 Research/VolRegime-Engine/data/injection_runs/inj_d0.2_q5_W120.json",
+      "W": 120,
+      "q": 5,
+      "delta_target": 0.2,
+      "N_mc": 200,
+      "n_draws": 200,
+      "n_fires": 0,
+      "P_det": 0.0,
+      "trigger_entropy_nats": 0.0,
+      "mi_upper_bound_nats": 0.0,
+      "mi_nats_if_conditioning_within_saturated_cell": 0.0,
+      "note": "Within-cell path-level trigger MI is bounded by H(D). A saturated 0/200 or 200/200 cell has H(D)=0 and therefore MI=0."
+    },
+    {
+      "path": "C:/Users/dfua1/OneDrive/Documents/Coding/M5 Research/VolRegime-Engine/data/injection_runs/inj_d0.3_q5_W120.json",
+      "W": 120,
+      "q": 5,
+      "delta_target": 0.3,
+      "N_mc": 200,
+      "n_draws": 200,
+      "n_fires": 200,
+      "P_det": 1.0,
+      "trigger_entropy_nats": 0.0,
+      "mi_upper_bound_nats": 0.0,
+      "mi_nats_if_conditioning_within_saturated_cell": 0.0,
+      "note": "Within-cell path-level trigger MI is bounded by H(D). A saturated 0/200 or 200/200 cell has H(D)=0 and therefore MI=0."
+    }
+  ],
+  "interpretation": "The Monte Carlo cell trigger is a path-level saturated label in the cited q=2 and q=5 cells, so within-cell MI is zero by H(D)=0. The time-local rows report the detector-contingent MI estimand used for economic work checks.",
+  "provenance": {
+    "code_commit": "97416f404fed3f67325b899e8828f0ccbd333d9d",
+    "omp_num_threads": "1",
+    "seed": 43
+  }
+}

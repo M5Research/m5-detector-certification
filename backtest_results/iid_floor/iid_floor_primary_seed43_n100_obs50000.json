@@ -1,0 +1,15 @@
+{
+  "description": "Synthetic Gaussian i.i.d. per-window |VR(q)-1| floor.",
+  "seed": 43,
+  "rows": [
+    {
+      "W": 120,
+      "q": 5,
+      "n_paths": 100,
+      "n_obs": 50000,
+      "n_samples_total": 41600,
+      "delta_iid_p50": 0.13881867787614277,
+      "delta_iid_p95": 0.3967030316009547
+    }
+  ]
+}

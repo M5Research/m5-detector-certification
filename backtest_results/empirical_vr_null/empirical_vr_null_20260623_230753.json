@@ -1,0 +1,77 @@
+{
+  "description": "Minimal empirical VR null: centered circular block bootstrap of in-sample returns, recomputing non-overlapping median z_m2.",
+  "null_family": "centered_circular_block_bootstrap",
+  "block_length": 120,
+  "n_boot": 100,
+  "seed": 43,
+  "n_returns": 2415148,
+  "year_2026_loaded": false,
+  "cells": [
+    {
+      "W": 120,
+      "q": 5,
+      "observed_uninjected": {
+        "median_z_m2": -0.40167196271982036,
+        "n_windows": 20126,
+        "asymptotic_two_sided_p": 0.6879254611638921,
+        "empirical_two_sided_p_vs_null": 0.04950495049504951,
+        "empirical_positive_gate_p_vs_null": 0.9603960396039604
+      },
+      "null_summary": {
+        "n_boot_finite": 100,
+        "median_z_p05": -0.4010269976347944,
+        "median_z_p50": -0.3891528447766485,
+        "median_z_p95": -0.3781573396243414,
+        "empirical_size_alpha_0.05_asymptotic_two_sided": 0.0
+      }
+    },
+    {
+      "W": 120,
+      "q": 2,
+      "observed_uninjected": {
+        "median_z_m2": -0.1818937592933597,
+        "n_windows": 20126,
+        "asymptotic_two_sided_p": 0.8556661021637663,
+        "empirical_two_sided_p_vs_null": 0.039603960396039604,
+        "empirical_positive_gate_p_vs_null": 0.9702970297029703
+      },
+      "null_summary": {
+        "n_boot_finite": 100,
+        "median_z_p05": -0.17965001296429345,
+        "median_z_p50": -0.1654117940837666,
+        "median_z_p95": -0.15067605563457634,
+        "empirical_size_alpha_0.05_asymptotic_two_sided": 0.0
+      }
+    }
+  ],
+  "addendum_cells": [
+    {
+      "path": "data\\injection_runs\\inj_d0.15_q2_W120.json",
+      "delta_target": 0.15,
+      "W": 120,
+      "q": 2,
+      "P_det": 1.0,
+      "n_fires": 200,
+      "N_mc": 200,
+      "median_draw_median_z_m2": 2.675346263823341,
+      "n_draws_with_z": 200,
+      "empirical_two_sided_p_vs_null": 0.009900990099009901,
+      "empirical_positive_gate_p_vs_null": 0.009900990099009901
+    },
+    {
+      "path": "data\\injection_runs\\inj_d0.15_q5_W120.json",
+      "delta_target": 0.15,
+      "W": 120,
+      "q": 5,
+      "P_det": 0.0,
+      "n_fires": 0,
+      "N_mc": 200,
+      "median_draw_median_z_m2": 0.644334633991033,
+      "n_draws_with_z": 200,
+      "empirical_two_sided_p_vs_null": 0.009900990099009901,
+      "empirical_positive_gate_p_vs_null": 0.009900990099009901
+    }
+  ],
+  "source_npz": "data\\injection_runs\\precomputed.npz",
+  "generated_utc": "2026-06-23T23:07:53.520138+00:00"
+}

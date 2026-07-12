@@ -1,0 +1,107 @@
+{
+  "per_q_results": [
+    {
+      "q": 2,
+      "observed_vr_dep": 0.07449977995112222,
+      "gaussian_mi_nats": 0.002782838448964952,
+      "gaussian_gmax_bps": 27.828384489649522,
+      "envelope_delta_star_90": 0.1,
+      "envelope_gaussian_mi_nats": 0.005025167926750725,
+      "envelope_gaussian_gmax_bps": 50.25167926750725,
+      "ksg_mi_nats": 0.001906459007128384,
+      "ksg_mi_stderr": 0.00037991586911028454,
+      "ksg_gmax_bps": 19.06459007128384,
+      "exclusion_gap_bps": 22.423294777857727,
+      "verdict_gaussian_vs_taker": "bound_exceeds_costs",
+      "verdict_sign_pair_vs_taker": "bound_exceeds_costs",
+      "verdict_vs_taker": "bound_exceeds_costs"
+    },
+    {
+      "q": 5,
+      "observed_vr_dep": 0.15970197892485927,
+      "gaussian_mi_nats": 0.005006371340459067,
+      "gaussian_gmax_bps": 50.06371340459067,
+      "envelope_delta_star_90": 0.1,
+      "envelope_gaussian_mi_nats": 0.0019569496605681643,
+      "envelope_gaussian_gmax_bps": 19.569496605681643,
+      "ksg_mi_nats": 0.0020489568209634836,
+      "ksg_mi_stderr": 0.0003260315508315318,
+      "ksg_gmax_bps": 20.489568209634836,
+      "exclusion_gap_bps": -30.49421679890903,
+      "verdict_gaussian_vs_taker": "bound_exceeds_costs",
+      "verdict_sign_pair_vs_taker": "bound_exceeds_costs",
+      "verdict_vs_taker": "bound_exceeds_costs"
+    },
+    {
+      "q": 15,
+      "observed_vr_dep": 0.2909296528667691,
+      "gaussian_mi_nats": 0.012295361511993246,
+      "gaussian_gmax_bps": 122.95361511993246,
+      "envelope_delta_star_90": 0.1,
+      "envelope_gaussian_mi_nats": 0.0014370120062285978,
+      "envelope_gaussian_gmax_bps": 14.370120062285977,
+      "ksg_mi_nats": 0.0012524602755202801,
+      "ksg_mi_stderr": 0.00031671261677458136,
+      "ksg_gmax_bps": 12.524602755202801,
+      "exclusion_gap_bps": -108.58349505764649,
+      "verdict_gaussian_vs_taker": "bound_exceeds_costs",
+      "verdict_sign_pair_vs_taker": "bound_exceeds_costs",
+      "verdict_vs_taker": "bound_exceeds_costs"
+    },
+    {
+      "q": 60,
+      "observed_vr_dep": 0.4957478039625973,
+      "gaussian_mi_nats": 0.03282524079228575,
+      "gaussian_gmax_bps": 328.2524079228575,
+      "envelope_delta_star_90": 0.1,
+      "envelope_gaussian_mi_nats": 0.00129440601559907,
+      "envelope_gaussian_gmax_bps": 12.9440601559907,
+      "ksg_mi_nats": 0.0007348693745230744,
+      "ksg_mi_stderr": 0.00028525877902864404,
+      "ksg_gmax_bps": 7.348693745230745,
+      "exclusion_gap_bps": -315.3083477668668,
+      "verdict_gaussian_vs_taker": "bound_exceeds_costs",
+      "verdict_sign_pair_vs_taker": "demon_runs_at_loss",
+      "verdict_vs_taker": "demon_runs_at_loss"
+    }
+  ],
+  "headline_verdict": "bound_exceeds_costs",
+  "headline_q": 5,
+  "delta_star_info": {
+    "delta_star_90": 0.1,
+    "status": "above_grid",
+    "proxy_delta": 0.1
+  },
+  "exclusion_gap_summary": {
+    "headline_gap_bps": -30.49421679890903,
+    "headline_q": 5
+  },
+  "frozen_params": {
+    "W": 120,
+    "q_grid": [
+      2,
+      5,
+      15,
+      60
+    ],
+    "primary_q": 5,
+    "delta_grid_max": 0.1
+  },
+  "cost_schedule": {
+    "taker_fill_bps": 4.5,
+    "maker_fill_bps": 1.8,
+    "taker_rt_bps": [
+      9.0,
+      10.0
+    ],
+    "maker_rt_bps": [
+      3.6,
+      5.6
+    ]
+  },
+  "boot_seed": 43,
+  "run_id": "20260624_082448",
+  "prereg_commit": "1dc5c8295d3b212a00d704045d732e1b01d0d05d",
+  "code_commit": "31e3913c37bf36b6ab3fabd53359ebf9471539d4",
+  "run_date": "20260624_082448"
+}

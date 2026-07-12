@@ -1,0 +1,20 @@
+# Core numerics — required to reproduce the paper's values from frozen artifacts.
+numpy>=1.26
+scipy>=1.13
+
+# Figures and the harmonized three-family benchmark.
+matplotlib>=3.8
+scikit-learn>=1.4
+statsmodels>=0.14
+
+# Parquet loaders for artifact regeneration from raw bars (not needed for the
+# offline artifact-only reproduction).
+pyarrow>=14.0
+
+# Optional: faster bootstraps / the GARCH filter-sensitivity check.
+# The scripts fall back to pure-Python / SciPy paths if these are absent.
+# arch>=8.0
+# numba>=0.58
+
+# To run the verification suite.
+pytest>=8.2

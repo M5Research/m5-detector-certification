@@ -1,0 +1,29 @@
+{
+  "run_id": "20260623_175305",
+  "holdout_confirmatory": true,
+  "year_2026_loaded": true,
+  "data_span": {
+    "start": "2026-01-01",
+    "end": "2026-05-29",
+    "n_bars": 214355,
+    "year_2026_loaded": true
+  },
+  "primary_cell": {
+    "W": 120,
+    "q": 5,
+    "n_nl": 1786,
+    "observed_vr_dep": 0.1575496087507378,
+    "mean_vr_dep": 0.18352093733687075,
+    "median_z_m2": -0.3328245344817033,
+    "p_twotailed": 0.739266737219734,
+    "closed": false,
+    "frozen_delta_star_lower_bound": 0.1,
+    "comparison": "observed_exceeds_frozen_lower_bound"
+  },
+  "provenance": {
+    "prereg_commit": "dd44e7a16e79702a232bec30fa90428b158c7c3e",
+    "code_commit": "31e3913c37bf36b6ab3fabd53359ebf9471539d4",
+    "jef_draft_marker": "C:\\Users\\dfua1\\OneDrive\\Documents\\Coding\\M5 Research\\VolRegime-Engine\\docs\\research\\calibrated-detector-exclusion\\.jef_draft_complete",
+    "run_utc": "2026-06-23T17:53:08.610366+00:00"
+  }
+}

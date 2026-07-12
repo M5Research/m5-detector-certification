@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# LaTeX build artifacts (keep main.tex, references.bib, figures/, main.pdf, main.bbl)
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+!paper/main.bbl
+paper/*.blg
+paper/*.synctex.gz
+paper/*.fls
+paper/*.fdb_latexmk
+
+# Raw / vendor market data — NOT redistributed (see README "Data access").
+# Frozen JSON artifacts and the injection .npz precompute ARE tracked.
+data/binance_futures/
+data/external/
+*.parquet
+*.csv

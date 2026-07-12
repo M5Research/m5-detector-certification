@@ -1,0 +1,645 @@
+{
+  "schema_version": 1,
+  "run_date": "2026-06-25T20:12:35.019601+00:00",
+  "benchmark": {
+    "protocol_id": "harmonized-regime-benchmark-mvp-v1",
+    "run_mode": "real",
+    "state_tasks": [
+      "2-state",
+      "3-state"
+    ],
+    "status_policy": {
+      "instrument_failure": "Detector outputs are not admissible as labels for agreement interpretation.",
+      "excluded_from_agreement_headline": "Detector has a different measurement target for this common-state headline.",
+      "valid": "Detector stream passes frozen benchmark validity gates."
+    },
+    "metrics": [
+      "confusion_matrix",
+      "cohens_kappa",
+      "ari",
+      "nmi",
+      "variation_of_information"
+    ],
+    "discrete_output_policy": "Agreement and detector-contingent MI use discrete detector states; soft HMM probabilities are converted by argmax before task remapping."
+  },
+  "data_span": {
+    "symbol": "BTCUSDT",
+    "start": "2022-10-01",
+    "end": "2022-12-31",
+    "n_bars": 132480,
+    "first_ts": "2022-10-01T00:00:00+00:00",
+    "last_ts": "2022-12-31T23:59:00+00:00",
+    "bar_frequency": "1min",
+    "downsampled": false,
+    "window_policy": "contiguous_time_domain_truncation_no_downsampling",
+    "q_units": "bars_at_native_1min_frequency",
+    "requested_start": "2022-10-01",
+    "requested_end": "2022-12-31",
+    "year_2026_loaded": false
+  },
+  "tasks": {
+    "2-state": {
+      "task": "2-state",
+      "n_states": 2,
+      "n_intersection": 89222,
+      "detectors": {
+        "rolling_quantile": {
+          "name": "rolling_quantile",
+          "common_state_eligible": true,
+          "validity": {
+            "status": "valid",
+            "reasons": [],
+            "nonoverlap_counts": {
+              "0": 1187,
+              "1": 301
+            },
+            "occupancy": {
+              "n_valid": 89222,
+              "counts": {
+                "0": 71713,
+                "1": 17509
+              },
+              "fractions": {
+                "0": 0.8037591625383874,
+                "1": 0.1962408374616126
+              }
+            }
+          },
+          "occupancy": {
+            "n_valid": 89222,
+            "counts": {
+              "0": 71713,
+              "1": 17509
+            },
+            "fractions": {
+              "0": 0.8037591625383874,
+              "1": 0.1962408374616126
+            }
+          },
+          "transition_matrix": [
+            [
+              71503,
+              209
+            ],
+            [
+              209,
+              17300
+            ]
+          ],
+          "run_lengths": {
+            "n_runs": 419,
+            "mean": 212.94033412887828,
+            "median": 52.0,
+            "max": 5027
+          },
+          "diagnostics": {
+            "convergence_ok": true,
+            "deterministic": true
+          }
+        },
+        "hmm": {
+          "name": "hmm",
+          "common_state_eligible": true,
+          "validity": {
+            "status": "instrument_failure",
+            "reasons": [
+              "state_0_nonoverlap_below_50"
+            ],
+            "nonoverlap_counts": {
+              "0": 1,
+              "1": 1487
+            },
+            "occupancy": {
+              "n_valid": 89222,
+              "counts": {
+                "0": 59,
+                "1": 89163
+              },
+              "fractions": {
+                "0": 0.0006612718836161485,
+                "1": 0.9993387281163838
+              }
+            }
+          },
+          "occupancy": {
+            "n_valid": 89222,
+            "counts": {
+              "0": 59,
+              "1": 89163
+            },
+            "fractions": {
+              "0": 0.0006612718836161485,
+              "1": 0.9993387281163838
+            }
+          },
+          "transition_matrix": [
+            [
+              58,
+              1
+            ],
+            [
+              1,
+              89161
+            ]
+          ],
+          "run_lengths": {
+            "n_runs": 3,
+            "mean": 29740.666666666668,
+            "median": 12637.0,
+            "max": 76526
+          },
+          "diagnostics": {
+            "convergence_ok": true,
+            "deterministic": true,
+            "variance_separation": [
+              426.0966385427413
+            ],
+            "sigma2_sorted": [
+              0.0010682980150513261,
+              0.4551981931752529
+            ],
+            "hmm_fallback": "none",
+            "hmm_regimes": 2,
+            "hmm_em_iter": 10,
+            "hmm_search_reps": 1,
+            "hmm_profile": "explicit_2_state_harmonized_profile"
+          }
+        },
+        "vr_cascade": {
+          "name": "vr_cascade",
+          "common_state_eligible": false,
+          "validity": {
+            "status": "excluded_from_agreement_headline",
+            "reasons": [
+              "target_not_common_market_state"
+            ],
+            "nonoverlap_counts": {
+              "0": 1111,
+              "1": 377
+            },
+            "occupancy": {
+              "n_valid": 89222,
+              "counts": {
+                "0": 66451,
+                "1": 22771
+              },
+              "fractions": {
+                "0": 0.7447826769182488,
+                "1": 0.25521732308175116
+              }
+            }
+          },
+          "occupancy": {
+            "n_valid": 89222,
+            "counts": {
+              "0": 66451,
+              "1": 22771
+            },
+            "fractions": {
+              "0": 0.7447826769182488,
+              "1": 0.25521732308175116
+            }
+          },
+          "transition_matrix": [
+            [
+              64935,
+              1515
+            ],
+            [
+              1515,
+              21256
+            ]
+          ],
+          "run_lengths": {
+            "n_runs": 3031,
+            "mean": 29.4364896073903,
+            "median": 6.0,
+            "max": 423
+          },
+          "diagnostics": {
+            "convergence_ok": true,
+            "deterministic": true,
+            "target": "serial_dependence",
+            "W": 120,
+            "q": 5,
+            "z_median": -0.3335347024702115
+          }
+        }
+      },
+      "pairwise": {},
+      "economic": {
+        "rolling_quantile": {
+          "n": 89217,
+          "mi_nats": 0.0005027760233223773,
+          "bootstrap_ci_nats": [
+            0.0003471017755485793,
+            0.0006664309316211074
+          ],
+          "permutation_p": 0.004975124378109453,
+          "gross_bound_bps": 5.0277602332237725,
+          "cost_bps": 10.0,
+          "net_bound_bps": -4.9722397667762275,
+          "conditional_forward_return": {
+            "0": {
+              "n": 71708,
+              "mean": -4.3389317507501775e-06,
+              "median": 0.0,
+              "positive_fraction": 0.4992748368382886
+            },
+            "1": {
+              "n": 17509,
+              "mean": -4.4216809624236534e-05,
+              "median": 0.0,
+              "positive_fraction": 0.4986578331143983
+            }
+          }
+        },
+        "hmm": {
+          "n": 89217,
+          "mi_nats": 1.1137634844068142e-05,
+          "bootstrap_ci_nats": [
+            3.309477217525919e-06,
+            5.053376529495118e-05
+          ],
+          "permutation_p": 0.30845771144278605,
+          "gross_bound_bps": 0.11137634844068142,
+          "cost_bps": 10.0,
+          "net_bound_bps": -9.88862365155932,
+          "conditional_forward_return": {
+            "0": {
+              "n": 59,
+              "mean": 0.0011103023641080073,
+              "median": 0.001255140459734504,
+              "positive_fraction": 0.576271186440678
+            },
+            "1": {
+              "n": 89158,
+              "mean": -1.290782742071294e-05,
+              "median": 0.0,
+              "positive_fraction": 0.4991027165257184
+            }
+          }
+        },
+        "vr_cascade": {
+          "n": 89217,
+          "mi_nats": 5.600878176635605e-06,
+          "bootstrap_ci_nats": [
+            1.6245564376816717e-06,
+            5.764494909415614e-05
+          ],
+          "permutation_p": 0.5771144278606966,
+          "gross_bound_bps": 0.05600878176635605,
+          "cost_bps": 10.0,
+          "net_bound_bps": -9.943991218233643,
+          "conditional_forward_return": {
+            "0": {
+              "n": 66446,
+              "mean": -7.407420208994619e-06,
+              "median": 4.716642029216224e-06,
+              "positive_fraction": 0.500105348704211
+            },
+            "1": {
+              "n": 22771,
+              "mean": -2.6047814961428802e-05,
+              "median": 0.0,
+              "positive_fraction": 0.4963769707083571
+            }
+          }
+        }
+      }
+    },
+    "3-state": {
+      "task": "3-state",
+      "n_states": 3,
+      "n_intersection": 89222,
+      "detectors": {
+        "rolling_quantile": {
+          "name": "rolling_quantile",
+          "common_state_eligible": true,
+          "validity": {
+            "status": "valid",
+            "reasons": [],
+            "nonoverlap_counts": {
+              "0": 1187,
+              "1": 224,
+              "2": 77
+            },
+            "occupancy": {
+              "n_valid": 89222,
+              "counts": {
+                "0": 71713,
+                "1": 12717,
+                "2": 4792
+              },
+              "fractions": {
+                "0": 0.8037591625383874,
+                "1": 0.14253211091434848,
+                "2": 0.05370872654726413
+              }
+            }
+          },
+          "occupancy": {
+            "n_valid": 89222,
+            "counts": {
+              "0": 71713,
+              "1": 12717,
+              "2": 4792
+            },
+            "fractions": {
+              "0": 0.8037591625383874,
+              "1": 0.14253211091434848,
+              "2": 0.05370872654726413
+            }
+          },
+          "transition_matrix": [
+            [
+              71503,
+              208,
+              1
+            ],
+            [
+              209,
+              12447,
+              61
+            ],
+            [
+              0,
+              62,
+              4730
+            ]
+          ],
+          "run_lengths": {
+            "n_runs": 542,
+            "mean": 164.61623616236162,
+            "median": 41.0,
+            "max": 4712
+          },
+          "diagnostics": {
+            "convergence_ok": true,
+            "deterministic": true
+          }
+        },
+        "hmm": {
+          "name": "hmm",
+          "common_state_eligible": true,
+          "validity": {
+            "status": "instrument_failure",
+            "reasons": [
+              "state_0_nonoverlap_below_50",
+              "state_2_nonoverlap_below_50"
+            ],
+            "nonoverlap_counts": {
+              "0": 1,
+              "1": 1487,
+              "2": 0
+            },
+            "occupancy": {
+              "n_valid": 89222,
+              "counts": {
+                "0": 59,
+                "1": 89163,
+                "2": 0
+              },
+              "fractions": {
+                "0": 0.0006612718836161485,
+                "1": 0.9993387281163838,
+                "2": 0.0
+              }
+            }
+          },
+          "occupancy": {
+            "n_valid": 89222,
+            "counts": {
+              "0": 59,
+              "1": 89163,
+              "2": 0
+            },
+            "fractions": {
+              "0": 0.0006612718836161485,
+              "1": 0.9993387281163838,
+              "2": 0.0
+            }
+          },
+          "transition_matrix": [
+            [
+              58,
+              1,
+              0
+            ],
+            [
+              1,
+              89161,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "run_lengths": {
+            "n_runs": 3,
+            "mean": 29740.666666666668,
+            "median": 12637.0,
+            "max": 76526
+          },
+          "diagnostics": {
+            "convergence_ok": true,
+            "deterministic": true,
+            "variance_separation": [
+              426.0966385427413
+            ],
+            "sigma2_sorted": [
+              0.0010682980150513261,
+              0.4551981931752529
+            ],
+            "hmm_fallback": "none",
+            "hmm_regimes": 2,
+            "hmm_em_iter": 10,
+            "hmm_search_reps": 1,
+            "hmm_profile": "explicit_2_state_harmonized_profile"
+          }
+        },
+        "vr_cascade": {
+          "name": "vr_cascade",
+          "common_state_eligible": false,
+          "validity": {
+            "status": "excluded_from_agreement_headline",
+            "reasons": [
+              "target_not_common_market_state"
+            ],
+            "nonoverlap_counts": {
+              "0": 1111,
+              "1": 296,
+              "2": 81
+            },
+            "occupancy": {
+              "n_valid": 89222,
+              "counts": {
+                "0": 66451,
+                "1": 18150,
+                "2": 4621
+              },
+              "fractions": {
+                "0": 0.7447826769182488,
+                "1": 0.2034251641971711,
+                "2": 0.05179215888458004
+              }
+            }
+          },
+          "occupancy": {
+            "n_valid": 89222,
+            "counts": {
+              "0": 66451,
+              "1": 18150,
+              "2": 4621
+            },
+            "fractions": {
+              "0": 0.7447826769182488,
+              "1": 0.2034251641971711,
+              "2": 0.05179215888458004
+            }
+          },
+          "transition_matrix": [
+            [
+              64935,
+              1481,
+              34
+            ],
+            [
+              1487,
+              16252,
+              411
+            ],
+            [
+              28,
+              417,
+              4176
+            ]
+          ],
+          "run_lengths": {
+            "n_runs": 3859,
+            "mean": 23.120497538222338,
+            "median": 5.0,
+            "max": 423
+          },
+          "diagnostics": {
+            "convergence_ok": true,
+            "deterministic": true,
+            "target": "serial_dependence",
+            "W": 120,
+            "q": 5,
+            "z_median": -0.3335347024702115
+          }
+        }
+      },
+      "pairwise": {},
+      "economic": {
+        "rolling_quantile": {
+          "n": 89217,
+          "mi_nats": 0.0005468793985535245,
+          "bootstrap_ci_nats": [
+            0.0003806197536971315,
+            0.0007369628073279796
+          ],
+          "permutation_p": 0.004975124378109453,
+          "gross_bound_bps": 5.468793985535245,
+          "cost_bps": 10.0,
+          "net_bound_bps": -4.531206014464755,
+          "conditional_forward_return": {
+            "0": {
+              "n": 71708,
+              "mean": -4.3389317507501775e-06,
+              "median": 0.0,
+              "positive_fraction": 0.4992748368382886
+            },
+            "1": {
+              "n": 12717,
+              "mean": 1.1189525260610429e-05,
+              "median": 1.1905612305909452e-05,
+              "positive_fraction": 0.5028701737831249
+            },
+            "2": {
+              "n": 4792,
+              "mean": -0.00019125403014397761,
+              "median": -8.34221209689215e-05,
+              "positive_fraction": 0.48747913188647746
+            }
+          }
+        },
+        "hmm": {
+          "n": 89217,
+          "mi_nats": 1.1137634844068142e-05,
+          "bootstrap_ci_nats": [
+            3.309477217525919e-06,
+            5.053376529495118e-05
+          ],
+          "permutation_p": 0.30845771144278605,
+          "gross_bound_bps": 0.11137634844068142,
+          "cost_bps": 10.0,
+          "net_bound_bps": -9.88862365155932,
+          "conditional_forward_return": {
+            "0": {
+              "n": 59,
+              "mean": 0.0011103023641080073,
+              "median": 0.001255140459734504,
+              "positive_fraction": 0.576271186440678
+            },
+            "1": {
+              "n": 89158,
+              "mean": -1.290782742071294e-05,
+              "median": 0.0,
+              "positive_fraction": 0.4991027165257184
+            },
+            "2": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "positive_fraction": null
+            }
+          }
+        },
+        "vr_cascade": {
+          "n": 89217,
+          "mi_nats": 3.9204887360318294e-05,
+          "bootstrap_ci_nats": [
+            1.1542476805459453e-05,
+            0.0001165972787424865
+          ],
+          "permutation_p": 0.15422885572139303,
+          "gross_bound_bps": 0.39204887360318297,
+          "cost_bps": 10.0,
+          "net_bound_bps": -9.607951126396816,
+          "conditional_forward_return": {
+            "0": {
+              "n": 66446,
+              "mean": -7.407420208994619e-06,
+              "median": 4.716642029216224e-06,
+              "positive_fraction": 0.500105348704211
+            },
+            "1": {
+              "n": 18150,
+              "mean": -4.009973940906133e-05,
+              "median": -5.917457752427076e-06,
+              "positive_fraction": 0.49239669421487603
+            },
+            "2": {
+              "n": 4621,
+              "mean": 2.9144227610423684e-05,
+              "median": 2.3645133832687884e-05,
+              "positive_fraction": 0.5120103873620429
+            }
+          }
+        }
+      }
+    }
+  },
+  "disposition": {
+    "classification": "instrument_failure",
+    "reason": "At least one detector failed frozen validity gates; report instrument failure before interpreting disagreement."
+  },
+  "provenance": {
+    "code_commit": "97416f404fed3f67325b899e8828f0ccbd333d9d",
+    "omp_num_threads": "1"
+  }
+}

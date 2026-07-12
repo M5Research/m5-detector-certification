@@ -1,0 +1,50 @@
+{
+  "probe": "mi_bootstrap_sensitivity",
+  "n_boot": 100,
+  "production_reference": {
+    "q": 5,
+    "mi_nats": 0.0016658207031126776,
+    "mi_stderr": 0.00030634341515349415
+  },
+  "rows": [
+    {
+      "q": 5,
+      "block_length": 0,
+      "resampling": "iid_pairs",
+      "mi_nats": 0.0018351909520176587,
+      "mi_stderr": 0.0003792761406571548,
+      "gmax_bps": 18.351909520176587,
+      "gmax_stderr_bps": 3.792761406571548
+    },
+    {
+      "q": 5,
+      "block_length": 60,
+      "resampling": "block_60",
+      "mi_nats": 0.002157930185813587,
+      "mi_stderr": 0.00044970124351076244,
+      "gmax_bps": 21.57930185813587,
+      "gmax_stderr_bps": 4.497012435107624
+    },
+    {
+      "q": 5,
+      "block_length": 120,
+      "resampling": "block_120",
+      "mi_nats": 0.0019079074389666585,
+      "mi_stderr": 0.0006774443447659474,
+      "gmax_bps": 19.079074389666584,
+      "gmax_stderr_bps": 6.774443447659474
+    },
+    {
+      "q": 5,
+      "block_length": 240,
+      "resampling": "block_240",
+      "mi_nats": 0.0017884026437252115,
+      "mi_stderr": 0.0008115314291477215,
+      "gmax_bps": 17.884026437252114,
+      "gmax_stderr_bps": 8.115314291477215
+    }
+  ],
+  "provenance": {
+    "timestamp": "2026-06-23T10:54:04.786548Z"
+  }
+}

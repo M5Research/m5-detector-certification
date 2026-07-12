@@ -1,0 +1,33 @@
+[project]
+name = "m5-detector-certification"
+version = "0.1.0"
+description = "Reproduction package for 'Certifying Regime Detectors Before Use' (M5 Research)."
+readme = "README.md"
+requires-python = ">=3.11"
+
+# Needed to reproduce the paper's values from the frozen artifacts.
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.13",
+  "matplotlib>=3.8",
+  "scikit-learn>=1.4",
+  "statsmodels>=0.14",
+  "pyarrow>=14.0",
+]
+
+[project.optional-dependencies]
+# Speed-ups / the GARCH filter-sensitivity check (pure-Python fallbacks exist).
+extras = ["arch>=8.0", "numba>=0.58"]
+# Only to (re)download raw market data for artifact regeneration.
+download = ["pandas>=2.2", "aiohttp>=3.9", "requests>=2.32"]
+dev = ["pytest>=8.2"]
+
+[tool.pytest.ini_options]
+addopts = "-ra -m 'not slow and not data'"
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+markers = [
+  "slow: slow tests (deselected by default; run with -m slow)",
+  "data: tests requiring local vendor market data not redistributed here",
+  "artifact: tests validating frozen research artifacts",
+]
