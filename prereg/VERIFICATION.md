@@ -43,19 +43,22 @@ the authors, not an independent record, and readers should treat it as such.
 This limitation is the reason for the archival deposit described below, and it
 is stated here rather than left for a reader to discover.
 
-## Archival deposit status
+## Archival deposit
 
-A deposit of this directory to OSF or Zenodo fixes the document content under
-an independent DOI and makes the protocol permanently readable. It is
-**not** a prospective pre-registration: any deposit made after 2026-06-05
-post-dates the Pre-Check runs and after 2026-06-23 post-dates the holdout run,
-so the deposit date cannot function as the pre-registration timestamp. The
-manuscript must describe such a deposit as an archival record of the frozen
-specification, never as the registration event.
+This directory is archived at
+[**10.6084/m9.figshare.33106934**](https://doi.org/10.6084/m9.figshare.33106934),
+which fixes the document content under an independent DOI and makes the
+protocol permanently readable.
 
-Deposit metadata is prepared in `.zenodo.json`. When the deposit is made, add
-the resulting DOI to this file and to the manuscript's freeze-timeline table,
-described accurately.
+That deposit is **not** a prospective pre-registration. It was made in July
+2026, which post-dates the Pre-Check runs (2026-06-05) by seven weeks and the
+holdout run (2026-06-23) by five, so the deposit date cannot function as the
+pre-registration timestamp and is not offered as one. It establishes what the
+frozen documents say and that they cannot be silently altered — nothing more.
+The manuscript describes it on exactly those terms.
+
+`.zenodo.json` carries the same deposit metadata in machine-readable form and
+is retained for any future deposit.
 
 ## Independent verification
 
