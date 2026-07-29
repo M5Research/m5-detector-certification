@@ -12,6 +12,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  artifact-hygiene:
+    name: Artifact hygiene (no absolute paths)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Generated artifacts inherit whatever path the producing machine used.
+      # Those paths leak a contributor's username and are not reproducible,
+      # so they must never reach the public repository.
+      - name: Check for developer absolute paths
+        run: python scripts/check_no_absolute_paths.py
+
   test:
     name: Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
