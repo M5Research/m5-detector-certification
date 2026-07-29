@@ -1,0 +1,33 @@
+# Machine-readable freeze anchors for the pre-registration lineage.
+# Each freeze commit is a standalone commit in the development repository
+# https://github.com/M5Research/VolRegime-Engine and must timestamp-predate
+# every run that cites it. Verify with:
+#   git log -1 --format="%H %ct %ci %s" <commit>
+
+freeze_v3_commit=720c1d4d2ce0d50c8428f83b7690ab62ae9db37a
+freeze_v3_short=720c1d4
+freeze_v3_unix=1780650753
+freeze_v3_utc=2026-06-05T09:12:33Z
+freeze_v3_subject=docs(07): ratify v3.0 pre-check pre-registration (no-HARKing freeze)
+freeze_v3_path=.planning/phases/07-pre-registration-freeze/07-PREREGISTRATION.md
+
+amendment_d07_commit=dd44e7a16e79702a232bec30fa90428b158c7c3e
+amendment_d07_short=dd44e7a
+amendment_d07_unix=1780665748
+amendment_d07_utc=2026-06-05T13:22:28Z
+amendment_d07_subject=docs(07): D-07 operationalization amendment (no-peeking, pre-result; freeze 720c1d4 untouched)
+
+freeze_v4_commit=1dc5c8295d3b
+freeze_v4_short=1dc5c82
+freeze_v4_unix=1781205673
+freeze_v4_utc=2026-06-11T19:21:13Z
+freeze_v4_subject=FREEZE: v4.0 pre-registration (09-PREREGISTRATION.md)
+
+# Cited runs (UTC), each recorded in its own artifact under backtest_results/
+run_precheck_a=2026-06-05T13:40:54Z
+run_precheck_b=2026-06-05T21:29:24Z
+run_holdout_confirmatory=2026-06-23T17:53:08Z
+
+repository_dev=https://github.com/M5Research/VolRegime-Engine
+repository_public=https://github.com/M5Research/m5-detector-certification
+paper_doi=10.2139/ssrn.7100358

@@ -1,0 +1,49 @@
+{
+  "title": "Certifying Regime Detectors Before Use — frozen pre-registration lineage",
+  "description": "Archival deposit of the frozen pre-registration protocol cited by the manuscript 'Certifying Regime Detectors Before Use' (DOI 10.2139/ssrn.7100358). Contains the numbers-free v3.0 pre-check pre-registration (git commit 720c1d4), the D-07 pre-result amendment (dd44e7a), the v4.0 freeze anchor (1dc5c82), and machine-readable commit and run timestamps. Git commit ordering in the development repository is the ordering evidence; because git committer timestamps are self-reported, this deposit provides independent fixity of document content only. The deposit date post-dates the cited runs and therefore does not constitute a prospective pre-registration timestamp.",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "creators": [
+    {
+      "name": "Urdaneta Achong, Diego Fernando",
+      "affiliation": "University of La Laguna"
+    },
+    {
+      "name": "Martel Flores, Claudio",
+      "affiliation": "M5 Research"
+    },
+    {
+      "name": "Boztosun, Melis",
+      "affiliation": "Università Cattolica del Sacro Cuore",
+      "orcid": "0009-0008-9337-2909"
+    },
+    {
+      "name": "Zhang, Everett",
+      "affiliation": "University of Waterloo"
+    }
+  ],
+  "keywords": [
+    "pre-registration",
+    "regime detection",
+    "detector certification",
+    "variance ratio",
+    "market efficiency",
+    "Bitcoin",
+    "Holm-Bonferroni",
+    "reproducibility"
+  ],
+  "license": "MIT",
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "10.2139/ssrn.7100358",
+      "scheme": "doi"
+    },
+    {
+      "relation": "isSupplementTo",
+      "identifier": "https://github.com/M5Research/m5-detector-certification",
+      "scheme": "url"
+    }
+  ],
+  "notes": "Freeze commits: 720c1d4d2ce0d50c8428f83b7690ab62ae9db37a (unix 1780650753, 2026-06-05T09:12:33Z); dd44e7a16e79702a232bec30fa90428b158c7c3e (unix 1780665748, 2026-06-05T13:22:28Z); 1dc5c82 (unix 1781205673, 2026-06-11T19:21:13Z). Cited runs: Pre-Check A 2026-06-05T13:40:54Z, Pre-Check B 2026-06-05T21:29:24Z, holdout confirmatory 2026-06-23T17:53:08Z. Every cited run post-dates the freeze it depends on. This deposit records document content; it is not a prospective registration timestamp."
+}
