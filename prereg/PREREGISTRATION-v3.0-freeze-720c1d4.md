@@ -8,6 +8,23 @@ ratified_by: execution-orchestrator (human-delegated)
 frozen_before_results: true
 ---
 
+> **Which state of this document is this?**
+>
+> This file is the document **as of amendment commit `dd44e7a`**, not as of the
+> freeze commit `720c1d4` its filename names. The difference is a pure append:
+> the final "Amendment A1" section (65 lines) was added by `dd44e7a`, and no
+> line of the frozen text was modified. Recover the exact freeze state with:
+>
+> ```bash
+> git show 720c1d4:.planning/phases/07-pre-registration-freeze/07-PREREGISTRATION.md
+> ```
+>
+> The filename keeps the freeze hash because that is the anchor the manuscript
+> cites; this note exists so the name cannot mislead. `VERIFICATION.md` records
+> the amendment and its timing, and `FREEZE_ANCHOR.txt` carries both hashes.
+
+
+
 # v3.0 Pre-Check Pre-Registration: Frozen Decision Protocol
 
 > **INTEGRITY CONTROL (D-07/D-08/D-09/D-15).** This document specifies the

@@ -157,6 +157,7 @@ Gauge defect is a measured property of the detector-market pair, not a prose cav
 | `tests/wp1/test_vr_detector_mi.py` | New tests | Guards zero-entropy behavior for saturated injection cells. |
 | `scripts/wp1/thermodynamic_bound.py` | Existing information-cost script | Refactor toward detector-output inputs. |
 | `scripts/wp1/mutual_information.py` | Existing MI estimators | Reuse estimator infrastructure. |
+| `backtest_results/thermodynamic_bound/mi_bootstrap_sensitivity.json` | Resampling-sensitivity probe for the sign-pair MI | Not cited by the manuscript. Its `production_reference.mi_nats` for `q=5` is `0.0016658`, against `0.0020490` in `thermo_report_20260624_082448.json`. The two are not inconsistent: the sign-pair MI point estimate is computed on a 50,000-pair subsample of ~2.4M available pairs (see `mutual_information.py`), so different call paths draw different subsamples. The gap is `0.00038` against a reported standard error of `0.00031`, i.e. about 1.25 SE, and the probe's own resampling rows (`0.00184`-`0.00216`) bracket the thermo value. Recorded here so the discrepancy is explained rather than discovered. |
 | `tests/wp1/test_thermodynamic_bound.py` | Existing tests | Keep cost-bound and graceful-degradation tests. |
 
 Existing raw sign-pair result:

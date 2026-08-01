@@ -457,7 +457,25 @@ def detector_contingent_information(
     n_perm: int = 1000,
     seed: int = 43,
 ) -> dict[str, Any]:
-    """Estimate detector-contingent MI against forward return sign."""
+    """Estimate detector-contingent MI against forward return sign.
+
+    UNCERTAINTY IS OPTIMISTIC HERE, by construction. The forward returns are
+    taken bar-by-bar over the detector intersection, so consecutive
+    observations share q-1 of their q bars. The bootstrap and permutation
+    below resample those observations as if they were independent, which
+    understates the standard error and narrows the reported interval by
+    roughly sqrt(q) in the worst case.
+
+    The variance-ratio path does not have this problem:
+    `vr_holm_trigger_information` samples with stride W, so its observations
+    do not overlap. That is the version whose numbers the manuscript reports
+    as evidence.
+
+    This exhibit's disposition is `instrument_failure` for an unrelated reason
+    (the bounded HMM profile is degenerate), so no conclusion rests on the
+    interval width. If this estimate is ever promoted, sample with stride q or
+    switch the resampling to blocks of length >= q.
+    """
     labels_arr = np.asarray(labels, dtype=np.int8)
     returns = np.asarray(forward_returns, dtype=np.float64)
     if labels_arr.shape != returns.shape:
