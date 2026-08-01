@@ -2,6 +2,24 @@
 
 This ledger records existing artifacts that can seed the GCDE paper. Paths are relative to the repository root.
 
+## Digest convention
+
+All SHA-256 digests in this ledger are computed over the file bytes **as
+committed, with LF line endings**, which `.gitattributes` now enforces on every
+platform. Verify with:
+
+```bash
+shasum -a 256 backtest_results/asset_replication/eth_replication_20260625_224506.json
+```
+
+or, on Windows, `Get-FileHash -Algorithm SHA256 <path>` from a fresh clone.
+
+Digests published before 2026-08-01 were computed against a Windows working
+tree in which `core.autocrlf` had rewritten LF to CRLF, and so did not verify
+on Linux or macOS. They have been recomputed against the committed bytes.
+`tests/wp1/test_frozen_artifacts.py` now checks every digest in this file on
+each CI run, so the ledger and the artifacts cannot drift apart again.
+
 ## Verification Pass
 
 Checked on 2026-06-26 against the repository working tree. All file-path artifacts cited in this ledger were found. Inline numeric values below were re-read from the cited JSON artifacts; rounded prose values match the source artifacts at the precision shown.
@@ -191,7 +209,7 @@ Existing ETHUSDT summary:
 | Information-cost | Raw sign-pair `q=5` gross bound `9.21` bps; no ETH-specific injection grid |
 | Persistence | `KS=0.2605`, bootstrap `p=0.0` |
 | Holdout primary cell | `|VR(5)-1|=0.1568`, median `Z_m,5=-0.3126`, `p=0.7546` |
-| SHA256 | `CFD31CEBD10797FC12F120A593B99E22DC1820416A50E7357D08459B3A7155EF` |
+| SHA256 of `backtest_results/asset_replication/eth_replication_20260625_224506.json` | `20E434D33C019FF6E737B992E789131C11D446F07EFB978C49550D83649CB15E` |
 
 Interpretation for GCDE:
 
