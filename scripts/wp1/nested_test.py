@@ -32,6 +32,8 @@ References
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 
 
@@ -372,9 +374,17 @@ def beta_t_boot_ci(
 
     lo = float(np.quantile(boots, alpha / 2))
     hi = float(np.quantile(boots, 1 - alpha / 2))
-    # Ensure CI contains the point estimate (clamp to lo <= point <= hi)
-    lo = min(lo, point)
-    hi = max(hi, point)
+    # NOT clamped to contain the point estimate. A percentile interval that
+    # excludes its own point estimate indicates bootstrap bias; clamping it
+    # distorts the nominal coverage and hides the diagnostic.
+    if not (lo <= point <= hi):
+        warnings.warn(
+            f"percentile CI [{lo:.6g}, {hi:.6g}] excludes its point estimate "
+            f"{point:.6g}; this indicates bootstrap bias in beta_T and the "
+            "interval should be read accordingly",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     return point, lo, hi
 
 

@@ -1,9 +1,27 @@
-"""Online GCDE sequential replay and max-statistic admission control.
+"""Online GCDE sequential replay — LEGACY prototype, retained for provenance.
 
-The module is intentionally split into small pure functions plus a CLI.  The
-statistical contract is that alpha is allocated by gate, while each gate's
-critical value is calibrated from the pathwise maximum over a replay horizon:
-``c_k = quantile_{1-alpha_k}(max_j Z^*_{j,k})``.
+NOT ADMISSIBLE EVIDENCE. The manuscript already says so; this docstring now
+says the same thing, so the code and the paper cannot drift apart. The
+prototype state machine replays a scripted schedule rather than calibrated
+e-processes, which under this paper's own rules is not admissible evidence.
+The anytime-valid claim rests on the betting e-process, which is not
+implemented here.
+
+The specific defect: in ``_build_real_artifact`` the max-statistic thresholds
+are calibrated by bootstrapping the OBSERVED statistic series rather than a
+null distribution, so the nominal alpha does not correspond to any well-defined
+null. The direction is conservative — the real replay almost never admits, and
+the artifact records persistent ``non_admitted`` as valid conservative
+behaviour — but conservatism is not calibration. Do not cite this artifact as a
+size-controlled sequential monitor.
+
+A genuine e-process monitor, if built, belongs in a new module rather than as a
+patch to this one.
+
+The module is intentionally split into small pure functions plus a CLI. The
+intended statistical contract was that alpha is allocated by gate, while each
+gate's critical value is calibrated from the pathwise maximum over a replay
+horizon: ``c_k = quantile_{1-alpha_k}(max_j Z^*_{j,k})``.
 """
 from __future__ import annotations
 

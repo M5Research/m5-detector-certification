@@ -65,7 +65,7 @@ def test_holdout_guard_rejects_2026(monkeypatch) -> None:
         gf.main()
 
 
-def test_all_pngs_emitted() -> None:
+def test_all_pngs_emitted(tmp_path, monkeypatch) -> None:
     """Driver exits 0 and all 5 expected PNGs exist under docs/research/figures/.
 
     Skips if real BTCUSDT 2021 Parquet data is absent.
@@ -78,10 +78,15 @@ def test_all_pngs_emitted() -> None:
     import scripts._bootstrap  # noqa: F401
     import scripts.wp1.generate_figures as gf
 
+    # Redirect output to tmp_path: gf.main() otherwise writes PNGs into the
+    # working tree, so running the suite left the repository dirty on any
+    # machine that has the parquet data.
+    figures_dir = tmp_path / "figures"
+    monkeypatch.setattr(gf, "FIGURES_DIR", figures_dir)
+
     rc = gf.main()
     assert rc == 0, f"generate_figures.main() returned non-zero exit code: {rc}"
 
-    figures_dir = _REPO_ROOT / "docs" / "research" / "figures"
     expected_pngs = [
         "fig01_diagnosis_histogram.png",
         "fig02_epsilon_sq_grid.png",
@@ -95,7 +100,7 @@ def test_all_pngs_emitted() -> None:
         assert png_path.stat().st_size > 0, f"PNG is empty: {png_path}"
 
 
-def test_determinism() -> None:
+def test_determinism(tmp_path, monkeypatch) -> None:
     """Running the driver twice produces pixel-identical PNGs for all 5 figures.
 
     Skips if real BTCUSDT 2021 Parquet data is absent.
@@ -113,7 +118,10 @@ def test_determinism() -> None:
     import scripts._bootstrap  # noqa: F401
     import scripts.wp1.generate_figures as gf
 
-    figures_dir = _REPO_ROOT / "docs" / "research" / "figures"
+    # Redirect output to tmp_path so the suite does not write into the tree.
+    figures_dir = tmp_path / "figures"
+    monkeypatch.setattr(gf, "FIGURES_DIR", figures_dir)
+
     expected_pngs = [
         "fig01_diagnosis_histogram.png",
         "fig02_epsilon_sq_grid.png",

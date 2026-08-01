@@ -14,6 +14,8 @@ SPARSE rule).
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 
 
@@ -137,11 +139,23 @@ def epsilon_sq_boot_ci(
         return point, float("nan"), float("nan")
     lo = float(np.quantile(boots, alpha / 2))
     hi = float(np.quantile(boots, 1 - alpha / 2))
-    # Ensure CI contains the point estimate (required by acceptance criteria):
-    # for bounded statistics near the ceiling/floor the percentile CI may exclude
-    # the observed value -- clamp to guarantee lo <= point <= hi.
-    lo = min(lo, point)
-    hi = max(hi, point)
+    # NOT clamped. The previous version forced lo <= point <= hi and justified
+    # it as "required by acceptance criteria". For a bounded statistic near its
+    # floor the percentile interval genuinely can exclude the observed value,
+    # but that is evidence of bootstrap bias, not a defect to edit out:
+    # clamping distorts the nominal coverage and suppresses the very diagnostic
+    # it reacts to. In a study arguing that instrument properties must be
+    # measured before use, bending an interval to satisfy an acceptance
+    # criterion is the one move that cannot be defended.
+    if not (lo <= point <= hi):
+        warnings.warn(
+            f"percentile CI [{lo:.6g}, {hi:.6g}] excludes its point estimate "
+            f"{point:.6g}; epsilon^2 is bounded below at 0, so this is "
+            "expected near the floor and signals bootstrap bias rather than "
+            "an error",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     return point, lo, hi
 
 

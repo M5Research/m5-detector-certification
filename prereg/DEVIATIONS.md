@@ -31,6 +31,8 @@ published claim is, and how it is resolved.
 | [D12](#d12-persistence-null-did-not-simulate-the-null) | Persistence null | **yes** |
 | [D13](#d13-the-repaired-instrument-is-size-controlled-only-at-the-primary-window) | Repair size scope | no |
 | [D14](#d14-the-48-repair-had-no-generator) | Repair had no generator | no |
+| [D15](#d15-confidence-intervals-were-clamped-to-contain-their-point-estimate) | Clamped intervals | no |
+| [D16](#d16-the-eth-replication-carries-the-same-superseded-margin) | ETH margin field | no |
 
 ---
 
@@ -425,6 +427,59 @@ grids agree, that the recentring is not a no-op, and that the repair never
 made power worse. All six cells pass. That is not proof the artifact was
 produced by this procedure, and the tool says so rather than implying
 otherwise.
+
+---
+
+## D15 — Confidence intervals were clamped to contain their point estimate
+
+**Executed.** Three bootstrap routines forced `lo <= point <= hi` after
+computing percentile bounds: `nested_test.beta_t_boot_ci`,
+`vr_significance.median_vr_dep_boot_ci` and
+`regime_population.epsilon_sq_boot_ci`. The third carried the comment
+"required by acceptance criteria".
+
+**Why it matters.** A percentile interval that excludes its own point estimate
+is a diagnostic: it says the bootstrap distribution is biased. Clamping
+distorts the nominal coverage and removes the signal. In a study whose thesis
+is that instrument properties must be measured before use, bending an interval
+to satisfy an acceptance criterion is the one move that cannot be defended.
+
+**What the clamp was hiding.** Removing it immediately failed a test, which is
+the finding. On the three-well-separated-group fixture,
+`epsilon_sq_boot_ci` returns point `0.8888` against interval
+`[0.8499, 0.8886]` — the point sits *above* the upper bound. That is genuine
+and reproducible: epsilon-squared is bounded above by 1, the fixture sits near
+that ceiling, and block resampling can essentially only move the statistic
+down, so the percentile interval is biased low exactly where the statistic is
+most informative.
+
+**Impact.** No published number changes. `epsilon_sq_boot_ci` supports the
+regime-population diagnostic, not a certificate gate.
+
+**Resolution.** Clamping removed from all three. Each now emits a
+`RuntimeWarning` naming the bound and the point estimate when the interval
+excludes it. The test that asserted the clamped ordering now asserts the bias
+directly, with a tolerance, so the bias is documented rather than hidden and a
+change in its size will fail. A BCa interval would be the principled fix if
+these intervals ever become load-bearing.
+
+---
+
+## D16 — The ETH replication carries the same superseded margin
+
+**Executed.** `eth_replication_20260625_224506.json` records
+`tost.epsilon = 0.02`, i.e. the same rounded constant corrected in D1, rather
+than the preregistered MDE.
+
+**Impact.** None. ETH's calendar gauge has the same non-overlapping window
+count as BTC's (20126 at `W=120`), so the preregistered margin is the same
+0.019748, and recomputing the full 12-comparison TOST and Holm family under it
+returns an **identical certified set**: calendar-volume at q=2, q=5 and q=60,
+and volume-event-time at q=2. No ETH verdict moves.
+
+**Resolution.** Recorded here rather than silently corrected, since the
+artifact's verdicts stand. `fig02_transport_forest` draws both panels against
+the preregistered margin so the two assets are judged by one rule.
 
 ---
 

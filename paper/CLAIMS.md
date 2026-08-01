@@ -67,8 +67,30 @@ Not allowed:
 
 Allowed:
 
-> Output-statistic equivalence is certified at `q=2` across calendar, volume, and
-> event-time bars, and is not certified at `q=5` for the same three scheme pairs.
+> Output-statistic equivalence is certified at `q=2` for calendar-volume and for
+> volume-event-time; it is not certified at `q=2` for calendar-event-time, nor
+> at `q=5` for any of the three scheme pairs.
+
+Not allowed:
+
+> Output-statistic equivalence is certified at `q=2` across all three scheme
+> pairs.
+
+This was the allowed form until 2026-08-01. It holds only under the rounded
+margin `0.02`. Under the preregistered margin `eps_g = MDE = 0.019748` the
+calendar-event-time pair returns Holm `0.0682` and does not certify. See
+`prereg/DEVIATIONS.md` D1.
+
+Not allowed:
+
+> The calendar-event-time pair shows a real discrepancy at `q=2`.
+
+Its 90% interval `[0.0105, 0.0179]` lies entirely inside the margin. What
+failed is the TOST at the frozen multiplicity denominator, which is a
+statement about precision, not a demonstrated difference. The preregistration
+forbids reading interval containment as equivalence, so the row is
+uncertified — but it must not be reported as a positive finding of
+non-equivalence either.
 
 Allowed:
 

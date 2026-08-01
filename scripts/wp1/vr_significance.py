@@ -18,6 +18,8 @@ Frozen constants (consumed, never recomputed):
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 
 # ---------------------------------------------------------------------------
@@ -194,9 +196,19 @@ def median_vr_dep_boot_ci(
 
     lo = float(np.quantile(boots, alpha / 2))
     hi = float(np.quantile(boots, 1 - alpha / 2))
-    # Clamp CI to contain the point estimate
-    lo = min(lo, point)
-    hi = max(hi, point)
+    # NOT clamped to contain the point estimate. A percentile interval that
+    # excludes its own point estimate is a signal of bootstrap bias, and
+    # clamping it away distorts the nominal coverage while hiding exactly the
+    # problem it is reacting to. If this fires, that is the finding.
+    if not (lo <= point <= hi):
+        warnings.warn(
+            f"percentile CI [{lo:.6g}, {hi:.6g}] excludes its point estimate "
+            f"{point:.6g}; this indicates bootstrap bias and the interval "
+            "should be read with that in mind (a BCa interval would be the "
+            "principled fix)",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     return point, lo, hi
 
 
