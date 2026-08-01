@@ -406,6 +406,14 @@ def compute_rolling_predictability(
         return np.full(N, np.nan, dtype=np.float64)
 
     log_close = np.log(close)
+    # r_full[0] is not a return: there is no price before the first bar. It is
+    # set to 0.0 rather than dropped so that r_full indexes align with close,
+    # which the window arithmetic downstream relies on. The cost is that the
+    # first window of width W contains one artificial zero, very slightly
+    # deflating its variance. With W=120 over ~2.4M bars this affects 1 of
+    # ~20126 non-overlapping windows and no reported figure moves, but it is a
+    # known contaminant rather than a neutral convention. See
+    # prereg/DEVIATIONS.md.
     r_full = np.empty(N, dtype=np.float64)
     r_full[0] = 0.0
     r_full[1:] = np.diff(log_close)

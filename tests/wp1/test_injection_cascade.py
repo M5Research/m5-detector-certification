@@ -60,9 +60,21 @@ def test_no_false_fires_at_delta_zero(synthetic_data, tmp_path):
     ci_lo, ci_hi = clopper_pearson_ci(n_fires, N_mc_test, alpha=0.05)
     print(f"delta=0: P_det={observed_rate:.4f} ({n_fires}/{N_mc_test}) CI=[{ci_lo:.4f}, {ci_hi:.4f}]")
     
-    assert observed_rate < 0.15, (
-        f"P_det at delta=0 is {observed_rate:.4f} ({n_fires}/{N_mc_test}) -- "
-        f"substantially above the expected 0.05 false-positive rate"
+    # The previous bound was `observed_rate < 0.15`, three times nominal, which
+    # would have passed a cascade firing on 29 of 200 null draws. This is the
+    # size property behind the paper's headline exclusion, so the test should
+    # be able to fail.
+    #
+    # The principled statement is that the observed rate is not *significantly*
+    # above nominal: the exact Clopper-Pearson lower bound must not exceed
+    # 0.05. At N=200 that admits up to 16 fires (8.0%) and rejects 17 (8.5%) —
+    # about twice as tight as the old bound, and a statement about the null
+    # rather than an arbitrary constant.
+    assert ci_lo <= 0.05, (
+        f"false-fire rate at delta=0 is significantly above nominal: "
+        f"{n_fires}/{N_mc_test} = {observed_rate:.4f}, exact 95% CI "
+        f"[{ci_lo:.4f}, {ci_hi:.4f}] — the lower bound exceeds 0.05, so this "
+        f"is not sampling noise"
     )
 
 @pytest.mark.slow

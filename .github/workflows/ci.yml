@@ -49,13 +49,47 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
 
+      # Installs from the package metadata, not by hand. While CI patched in
+      # missing packages itself, it was not testing whether the declared
+      # dependencies produce a working environment — which is the thing that
+      # most needs testing, since it is what a reader runs.
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          # Extra imports used across the test suite that are not in requirements.txt
-          # (optional accelerators + data/IO libs). Required for full test collection.
-          pip install "arch>=8.0" "numba>=0.58" "pandas>=2.2" polars aiohttp requests
+          pip install -e ".[dev,extras,download]"
 
       - name: Run test suite
         run: python -m pytest -q
+
+      # The README advertises this as the command that validates every frozen
+      # artifact. It silently selected zero tests for a while, so CI now
+      # asserts it selects and passes a non-empty set.
+      - name: Validate frozen artifacts
+        run: python -m pytest -m artifact -q
+
+  slow-tests:
+    name: Slow tests (Monte Carlo cascade)
+    runs-on: ubuntu-latest
+    # The size and monotonicity properties of the injection cascade back the
+    # paper's headline exclusion, and they are the only tests that exercise the
+    # cascade end to end. They take about nine minutes, so they are deselected
+    # by default — but "deselected by default" had meant "never run anywhere".
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,extras,download]"
+
+      - name: Run slow tests
+        timeout-minutes: 30
+        run: python -m pytest -m slow -q
