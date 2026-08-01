@@ -54,6 +54,41 @@ establish the run could not have preceded the freeze, and it is a weaker
 record than the four rows above. Every `code_commit` cited by any artifact in
 this repository post-dates the freeze that artifact cites.
 
+## Gate-guard provenance for the injection grid
+
+The 96-cell confirmatory grid was executed on 2026-06-14 (run log
+`low_impact_run.log`, 15:28:59–20:57:43), after the v4.0 freeze `1dc5c82`
+(2026-06-11 19:21:13 UTC).
+
+At execution time the injection driver did not invoke the pre-registration gate
+guard. `get_git_commit()` returned the literal string `bypassed_for_execution`,
+and the artifacts carried that string in `provenance.freeze_commit` rather than
+a commit hash. The guard was imported but never called.
+
+The defect was found in internal review, recorded as a blocker, and the cells
+were re-executed with the guard active. The artifacts went through three
+generations in the development repository:
+
+| Commit | Date | numpy | `freeze_commit` recorded |
+|---|---|---|---|
+| `58226a9` | 2026-06-15 16:45 | 2.4.4 | `bypassed_for_execution` |
+| `fa1d20d` | 2026-06-17 09:26 | 2.4.6 | `bypassed_for_execution` |
+| `31e3913` | 2026-06-22 17:35 | 2.4.4 | `1dc5c82` |
+
+The artifacts published here are the third generation. Across all three,
+**not one of the 96 cells changed its `P_det` or `n_fires`**: the decision
+statistic is stable under re-execution. The `library_versions` field does move,
+which is the signature of a genuine re-run rather than a hand-edited provenance
+block. No published artifact still carries the placeholder, and
+`tests/wp1/test_frozen_artifacts.py` asserts that on every CI run.
+
+**Consequence for the reader.** For this grid, freeze-before-run ordering is
+evidenced by the run log and by commit dates, *not* by a runtime assertion
+recorded inside the artifact at the moment of the run. The provenance blocks in
+the grid artifacts were written after the fact. That is a weaker record than a
+guard that fired, and it is stated here rather than left implicit in a claim
+that every artifact records its own commit.
+
 ## What this evidence does and does not establish
 
 **It establishes** that the specification documents in this directory are the
@@ -128,7 +163,14 @@ PY
 
 | File | Purpose |
 |---|---|
-| `PREREGISTRATION-v3.0-freeze-720c1d4.md` | The frozen v3.0 protocol, numbers-free |
-| `FREEZE_ANCHOR.txt` | Machine-readable commit hashes, unix times, and run times |
+| `PREREGISTRATION-v3.0-freeze-720c1d4.md` | The frozen v3.0 protocol, numbers-free. This file is the document as of amendment `dd44e7a`; the original `720c1d4` state is this file minus its final "Amendment A1" section, a pure append in which no frozen line was modified. |
+| `PREREGISTRATION-v4.0-freeze-1dc5c82.md` | The frozen v4.0 protocol, numbers-free. Governs the claim tuple, the 96-cell grid, the cascade trigger rule, the detection threshold, the transport margin, the cost schedule and the seed. Byte-identical to the file at freeze commit `1dc5c82`. |
+| `EXPLORATORY-ADDENDUM-PREREG.md` | The post-freeze exploratory addendum. **Not** a freeze — see the ordering disclosure in its header. |
+| `DEVIATIONS.md` | Every point where execution departed from the frozen protocol, or where the manuscript attributed something to the freeze that the freeze does not fix. |
+| `FREEZE_ANCHOR.txt` | Machine-readable commit hashes, unix times, document paths, and run times |
 | `.zenodo.json` | Prepared deposit metadata |
 | `VERIFICATION.md` | This file |
+
+All three protocol documents are published here. Earlier versions of this
+package published only v3.0 while citing v4.0 by hash, which left the document
+governing most of the confirmatory evidence unreadable.
