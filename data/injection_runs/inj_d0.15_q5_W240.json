@@ -9,7 +9,7 @@
   "n_fires": 0,
   "P_det": 0.0,
   "ci_95_lo": 0.0,
-  "ci_95_hi": 0.018185250054386256,
+  "ci_95_hi": 0.018275340355136237,
   "per_draw": [
     {
       "mc_idx": 0,
@@ -7023,5 +7023,12 @@
     },
     "w_invariant_clone": true,
     "cloned_from": "inj_d0.15_q5_W120.json"
+  },
+  "ci_schema": {
+    "method": "clopper_pearson_exact",
+    "alpha": 0.05,
+    "migrated_from": "beta_uniform_prior",
+    "script": "scripts/wp1/migrate_cp_intervals.py",
+    "note": "Only ci_95_lo and ci_95_hi were recomputed. P_det, n_fires and all per-draw records are unchanged from the frozen run."
   }
 }

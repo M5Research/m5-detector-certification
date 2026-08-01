@@ -26,10 +26,27 @@ def hash_combine(master_seed: int, mc_index: int, grid_hash: int) -> int:
     return int(m.hexdigest()[:16], 16)
 
 def clopper_pearson_ci(n_fires: int, N_mc: int, alpha: float = 0.05) -> tuple[float, float]:
+    """Exact Clopper-Pearson interval for a binomial proportion, by Beta inversion.
+
+        lo = B^-1(alpha/2;   k,   n-k+1),   = 0 if k == 0
+        hi = B^-1(1-alpha/2; k+1, n-k  ),   = 1 if k == n
+
+    Note the shape parameters differ between the bounds. An earlier version
+    used Beta(k+1, n-k+1) for BOTH, which is the Bayesian posterior interval
+    under a uniform Beta(1,1) prior, not the exact frequentist interval. The
+    two are close but not equal, and the difference runs in the direction that
+    matters here: for the k=0, n=200 case that dominates the power grid, the
+    posterior interval gives an upper bound of 0.018185 against the exact
+    0.018275, i.e. it reported the exclusion as very slightly tighter than the
+    stated method supports. Proposition 1 and the figures both claim
+    exactness, so the exact interval is the one to compute.
+    """
     from scipy.stats import beta
-    lo = beta.ppf(alpha / 2, n_fires + 1, N_mc - n_fires + 1) if n_fires > 0 else 0.0
-    hi = beta.ppf(1 - alpha / 2, n_fires + 1, N_mc - n_fires + 1) if n_fires < N_mc else 1.0
-    return (float(lo), float(hi))
+    lo = 0.0 if n_fires == 0 else float(beta.ppf(alpha / 2, n_fires, N_mc - n_fires + 1))
+    hi = 1.0 if n_fires == N_mc else float(
+        beta.ppf(1 - alpha / 2, n_fires + 1, N_mc - n_fires)
+    )
+    return (lo, hi)
 
 def fit_garch_sigma_t(returns: np.ndarray) -> np.ndarray:
     try:

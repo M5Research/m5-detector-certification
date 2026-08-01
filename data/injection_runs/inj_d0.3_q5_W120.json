@@ -8,7 +8,7 @@
   "N_mc": 200,
   "n_fires": 200,
   "P_det": 1.0,
-  "ci_95_lo": 0.9818147499456137,
+  "ci_95_lo": 0.9817246596448638,
   "ci_95_hi": 1.0,
   "per_draw": [
     {
@@ -7021,5 +7021,12 @@
     "library_versions": {
       "numpy": "2.4.4"
     }
+  },
+  "ci_schema": {
+    "method": "clopper_pearson_exact",
+    "alpha": 0.05,
+    "migrated_from": "beta_uniform_prior",
+    "script": "scripts/wp1/migrate_cp_intervals.py",
+    "note": "Only ci_95_lo and ci_95_hi were recomputed. P_det, n_fires and all per-draw records are unchanged from the frozen run."
   }
 }

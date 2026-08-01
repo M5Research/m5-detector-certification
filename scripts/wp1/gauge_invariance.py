@@ -57,6 +57,9 @@ __all__ = [
 GAUGE_DIR = PROJECT_ROOT / "backtest_results" / "gauge_invariance"
 BOOT_SEED = 43
 W_PRIMARY = 120
+# The rounded value reported in prose. NOT the test threshold: the frozen
+# margin is the MDE returned by compute_tost_epsilon() below (0.019748...).
+# Retained so the published 2026-06-24 artifact stays reproducible.
 PRACTICAL_TOST_EPSILON = 0.02
 _NORM_Z_90 = 1.6448536269514722
 _NORM_Z_95 = 1.959963984540054
@@ -268,9 +271,48 @@ def test_gauge_invariance(
 
 
 def compute_tost_epsilon(clock_pipeline_result: dict) -> float:
-    """Practical equivalence margin for median |VR-1| clock differences."""
-    _ = clock_pipeline_result
-    return float(PRACTICAL_TOST_EPSILON)
+    """Preregistered equivalence margin for median |VR-1| clock differences.
+
+    v4.0 §4.6 freezes the margin as
+    ``epsilon = MDE(q, W, n_eff, alpha=0.05, power=0.80)``, with the MDE
+    convention taken from the Pre-Check B cascade
+    (``vr_significance.compute_mde_vr``):
+
+        MDE = (z_{1-alpha/2} + z_{power}) / sqrt(n_nl)
+
+    ``n_nl`` is the non-overlapping window count of the CLOCK (calendar) gauge
+    at the primary window ``W_PRIMARY = 120``, which for the frozen 2021-2025
+    sample is 20126, giving ``epsilon = 0.019748090241536544``. That is one
+    margin for the whole comparison family, not a per-pair margin.
+
+    Reading ``n_eff`` per pair instead would give the intrinsic-bar pairs a
+    margin of 2.801585 / sqrt(454) = 0.1315, about seven times wider, under
+    which every pair certifies trivially and "equivalence" stops discriminating
+    anything. The single clock-anchored margin is the conservative reading and
+    is the one the original 2026-06-12 run implemented.
+
+    History: between 2026-06-12 and the published 2026-06-24 regeneration this
+    function was replaced by the constant ``PRACTICAL_TOST_EPSILON = 0.02``,
+    which is the rounded value the prose reports. The difference is 1.3% of the
+    margin and it flips the q=2 clock-intrinsic row. See prereg/DEVIATIONS.md
+    D1.
+    """
+    from scripts.wp1.vr_significance import compute_mde_vr  # noqa: PLC0415
+
+    n_nl = 0
+    for q in Q_GRID:
+        row = _median_row_for_q(clock_pipeline_result, q)
+        if row is not None and int(row.get("n_nl", 0)) > 0:
+            n_nl = int(row["n_nl"])
+            break
+
+    if n_nl <= 0:
+        raise ValueError(
+            "cannot derive the preregistered TOST margin: the clock pipeline "
+            "reports no non-overlapping windows at the primary W"
+        )
+
+    return float(compute_mde_vr(n_nl, alpha=0.05, power=0.80)["mde_vr_departure"])
 
 
 def run_vr_pipeline_for_gauge(

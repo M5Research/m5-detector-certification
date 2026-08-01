@@ -99,7 +99,15 @@ def test_tost_requires_ci_inside_equivalence_margin():
     assert any(not row["ci_within_margin"] for row in result["per_q_comparisons"])
 
 
-def test_compute_tost_epsilon_uses_practical_margin_not_mde():
+def test_compute_tost_epsilon_uses_preregistered_mde():
+    """The margin is the preregistered MDE, not the rounded prose constant.
+
+    v4.0 §4.6 fixes epsilon = MDE(q, W, n_eff, alpha=0.05, power=0.80) under
+    the Pre-Check B convention. This test previously asserted the opposite
+    (eps == PRACTICAL_TOST_EPSILON and eps != mde), which locked in an
+    undeclared post-freeze substitution of the constant 0.02 for the frozen
+    rule. See prereg/DEVIATIONS.md D1.
+    """
     n_nl = 500
     clock = {
         "per_wq": [{"W": 120, "q": 5, "n_nl": n_nl}],
@@ -107,8 +115,22 @@ def test_compute_tost_epsilon_uses_practical_margin_not_mde():
     }
     eps = compute_tost_epsilon(clock)
     mde = vr_significance.compute_mde_vr(n_nl)["mde_vr_departure"]
-    assert eps == PRACTICAL_TOST_EPSILON
-    assert eps != mde
+    assert eps == mde
+    assert eps != PRACTICAL_TOST_EPSILON
+
+
+def test_compute_tost_epsilon_matches_the_published_margin():
+    """At the frozen sample's window count the margin is 0.019748090241536544."""
+    clock = {
+        "per_wq": [{"W": 120, "q": 5, "n_nl": 20126}],
+        "per_wq_primary_q": [],
+    }
+    assert compute_tost_epsilon(clock) == 0.019748090241536544
+
+
+def test_compute_tost_epsilon_rejects_an_empty_clock_pipeline():
+    with pytest.raises(ValueError, match="non-overlapping"):
+        compute_tost_epsilon({"per_wq": [], "per_wq_primary_q": []})
 
 
 def test_verdict_strings_frozen():
