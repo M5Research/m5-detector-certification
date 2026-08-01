@@ -260,12 +260,30 @@ def compute_vr_significance(
     # Closure threshold: 0.001 consumed verbatim from §7 (never recomputed)
     closed = bool(median_vr_dep < 0.001)
 
+    # `p_twotailed` is the frozen trigger's reference tail probability, NOT a
+    # calibrated p-value, and the name is retained only because it is the key
+    # in every published artifact.
+    #
+    # It evaluates the standard normal tail at the MEDIAN of n window-level z
+    # statistics, as if that median were itself N(0,1). It is not: the median
+    # of n draws has SE ~= 1.2533/sqrt(n), so at n = 20126 the correct scale is
+    # about 0.0088, not 1. An observed median of -0.1819 is roughly 20 SE from
+    # zero, while this quantity reports 0.856.
+    #
+    # As a frozen decision rule that is legitimate: the detector is whatever it
+    # is, and its calibration is established by injection, which is exactly what
+    # the power grid does. What is not legitimate is reading the number as a
+    # p-value. The mis-centred and mis-scaled asymptotic reference IS the
+    # paper's size-gate finding. `median_se_approx` and the note below are
+    # emitted so the artifact carries that caveat with the number.
     if len(finite_z) == 0:
         p_twotailed = float("nan")
         median_z_m2 = float("nan")
+        median_se_approx = float("nan")
     else:
         median_z_m2 = float(np.median(finite_z))
         p_twotailed = 2.0 * float(norm.sf(abs(median_z_m2)))
+        median_se_approx = 1.2533141373155003 / float(np.sqrt(len(finite_z)))
 
     return {
         "median_vr_dep": median_vr_dep,
@@ -273,6 +291,14 @@ def compute_vr_significance(
         "n_nl": int(len(finite_pred)),
         "closed": closed,
         "p_twotailed": p_twotailed,
+        "median_se_approx": median_se_approx,
+        "p_twotailed_note": (
+            "Tail probability of the frozen asymptotic reference, not a "
+            "calibrated p-value: it treats the median of n window-level z "
+            "statistics as N(0,1), whereas that median has SE ~= "
+            "1.2533/sqrt(n) (see median_se_approx). The calibrated reference "
+            "is the empirical null in empirical_vr_null.py."
+        ),
         "median_z_m2": median_z_m2,
     }
 

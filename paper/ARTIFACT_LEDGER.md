@@ -46,6 +46,12 @@ Checked on 2026-06-26 against the repository working tree. All file-path artifac
 | `data/injection_runs/inj_d0.2_q5_W120.json` | Existing Monte Carlo injection cell | Extends the `q=5` silent region. |
 | `data/injection_runs/inj_d0.3_q5_W120.json` | Existing Monte Carlo injection cell | Demonstrates `P_det=1.0` at higher `q=5` amplitude. |
 | `scripts/wp1/signal_injection.py` | Existing injection orchestrator | Basis for a reusable detector response-surface estimator. |
+| `data/injection_runs/phi_grid.json` | Amplitude-to-AR(1) mapping | Translates target `delta` amplitudes to injected `phi`; without it the injection design is not auditable. |
+| `data/injection_runs/phi_grid_addendum.json` | Same, exploratory amplitudes | Covers the post-freeze `delta >= 0.15` extension. |
+| `data/injection_runs/garch_filter_sensitivity.json` | Filter-sensitivity check | Backs the GARCH/EWMA sigma_t robustness statement. |
+| `data/injection_runs/negative_phi_probe_primary.json` | Negative-phi probe | Negative control for the positive-only signal family. |
+| `backtest_results/gauge_invariance/gauge_report_mde_margin.json` | Transport gate under the preregistered MDE margin | Produced by `scripts/wp1/migrate_gauge_mde_margin.py` from the frozen diffs and standard errors; see `prereg/DEVIATIONS.md` D1. |
+| `scripts/wp1/reference_repair.py` | Generator for the §4.8 repair | Implements the recentering and audits the frozen artifact; see `prereg/DEVIATIONS.md` D14. |
 | `scripts/wp1/exclusion_plot.py` | Existing plotting/table script | Should be reframed from exclusion plot to response-surface plot. |
 | `tests/wp1/test_phase15_artifact_gate.py` | Existing artifact checks | Useful as provenance and schema guardrails. |
 
@@ -53,10 +59,16 @@ Current evidence anchors:
 
 | Cell | Fires | `P_det` | 95% CI |
 |---|---:|---:|---|
-| `delta=0.15, q=2, W=120` | `200/200` | `1.0` | `[0.9818, 1.0]` |
-| `delta=0.15, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0182]` |
-| `delta=0.20, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0182]` |
-| `delta=0.30, q=5, W=120` | `200/200` | `1.0` | `[0.9818, 1.0]` |
+| `delta=0.15, q=2, W=120` | `200/200` | `1.0` | `[0.9817, 1.0]` |
+| `delta=0.15, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0183]` |
+| `delta=0.20, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0183]` |
+| `delta=0.30, q=5, W=120` | `200/200` | `1.0` | `[0.9817, 1.0]` |
+
+Intervals are exact Clopper-Pearson, migrated from a uniform-prior Bayesian
+interval on 2026-08-01; see `prereg/DEVIATIONS.md` D10. Library versions are
+not uniform across cells: the 96 confirmatory cells and two exploratory cells
+ran under numpy 2.4.4, the remaining six exploratory cells under 1.26.4. Each
+cell records its own `library_versions`.
 
 Interpretation for GCDE:
 

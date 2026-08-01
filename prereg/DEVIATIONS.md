@@ -29,6 +29,8 @@ published claim is, and how it is resolved.
 | [D10](#d10-binomial-interval-method) | Binomial interval method | **yes** |
 | [D11](#d11-gate-guard-inactive-during-the-grid-run) | Gate guard | no |
 | [D12](#d12-persistence-null-did-not-simulate-the-null) | Persistence null | **yes** |
+| [D13](#d13-the-repaired-instrument-is-size-controlled-only-at-the-primary-window) | Repair size scope | no |
+| [D14](#d14-the-48-repair-had-no-generator) | Repair had no generator | no |
 
 ---
 
@@ -357,6 +359,72 @@ demonstrates the two side by side.
 legacy null and has **not** been regenerated: that needs the BTC parquet data,
 which is not redistributable in this package. Its `bootstrap_p_value` should
 be read as the legacy quantity until it is rerun.
+
+---
+
+## D13 — The repaired instrument is size-controlled only at the primary window
+
+**Found while writing the missing generator for §4.8**
+(`scripts/wp1/reference_repair.py`), not previously recorded anywhere.
+
+The repair's out-of-sample false-alarm rate, read from the frozen artifact:
+
+| Cell | OOS size |
+|---|---:|
+| W60, q=2 | 0.12 |
+| **W120, q=2** | **0.02** |
+| W240, q=2 | 0.08 |
+| W60, q=5 | 0.01 |
+| W120, q=5 | 0.07 |
+| W240, q=5 | 0.06 |
+
+The manuscript quotes 0.02 for the admissible certificate. That is the W120
+q=2 cell and it is correct. But at the other two q=2 windows the OOS size is
+0.12 and 0.08, both above the nominal 0.05.
+
+**Impact.** No published number is wrong. What was understated is how much
+work the certificate's `W=120` scoping does: the repaired instrument is *not*
+size-controlled across the window grid, only at the window the certificate
+declares. A reader could reasonably have assumed the repair generalised.
+
+**Resolution.** Recorded here, asserted in
+`tests/wp1/test_reference_repair.py`, and added to the manuscript's
+admissible-certificate scope row.
+
+---
+
+## D14 — The §4.8 repair had no generator
+
+**Claimed.** `README.md` describes the repair as an "exact offline
+re-thresholding of the frozen per-draw `median_z_m2`", i.e. fully reproducible
+with no new simulation.
+
+**Executed.** No script producing
+`recentered_reference_repair_20260710.json` existed in either repository. This
+was the sharpest asymmetry in the package: every negative result was
+reproducible from versioned code, and the single positive one — the protocol's
+first admissible certificate — was not.
+
+**Resolution, and its limit.** `scripts/wp1/reference_repair.py` now implements
+the repair: empirical-null estimation from the δ=0.0005 calibration cell,
+recentring, one-sided re-thresholding of the frozen draws, cMDE and δ₅₀
+extraction, and the split-half out-of-sample size. It is covered by tests
+including an end-to-end reproduction of a known threshold on synthetic data.
+
+It cannot regenerate the frozen artifact from this repository, because the
+per-draw `median_z_m2` values it consumes are not published: the injection
+cells carry only `cascade_fired`, `holm_ordered`, `mc_idx` and `seed`, and
+`precomputed.npz` holds the injection inputs rather than the per-draw
+statistic. This is the same root cause as D6. Emitting `median_z_m2` per draw
+when the grid is next regenerated closes D6 and D14 together.
+
+What can be checked today is checked: `reference_repair.py --verify` audits
+every relation internal to the frozen artifact — that each cell's cMDE and δ₅₀
+are exactly the thresholds implied by its own P_det table, that the amplitude
+grids agree, that the recentring is not a no-op, and that the repair never
+made power worse. All six cells pass. That is not proof the artifact was
+produced by this procedure, and the tool says so rather than implying
+otherwise.
 
 ---
 

@@ -1269,11 +1269,11 @@ BTCUSDT \dataspan).}
 Field & Certified content \\
 \midrule
 Claim tuple & Recentered VR trigger at $q{=}2$, $W{=}120$; target: positive short-horizon serial dependence (scientific, no economic target); calendar bars; positive AR(1) signal family; empirical-null reference from the $\delta\!=\!0.0005$ cell. Exploratory-grade (post-freeze recentering constants). \\
-Size & OOS false-alarm $0.02$ $[0,0.05]$; empirical-null reference replaces the mis-centered $N(0,1)$. \emph{Pass}. \\
+Size & OOS false-alarm $0.02$ $[0,0.05]$ at the declared window $W{=}120$; empirical-null reference replaces the mis-centered $N(0,1)$. \emph{Pass at $W{=}120$}. The recentering does not transport across the window grid: OOS size is $0.12$ at $W{=}60$ and $0.08$ at $W{=}240$, both above nominal. The $W{=}120$ scoping is therefore load-bearing, not incidental. \\
 Power & $\mathrm{cMDE}=0.02$ ($\delta_{90}$); $\delta_{50}=0.02$; recovers the preregistered amplitude grid. \emph{Pass} for $\delta\ge0.02$. \\
 Transport & Certified at $q{=}2$ for clock--volume and volume--intrinsic; clock--intrinsic not certified under the preregistered margin $\epsg=0.019748$ (Holm $0.0682$; Table~\ref{tab:transport}). \emph{Pass within the calendar-and-volume scheme scope}; event-time transport is outside the certified scope. \\
 Disposition & \textbf{Admissible} for the scoped claim. Empirical content: positive $q{=}2$ serial dependence above $\delta=0.02$ is \emph{excluded} on BTCUSDT with power $\ge0.9$ (observed statistic $-1.9$ SD, negative side). \\
-Scope note & The economic claim remains \emph{cost-dominated} and the $q{=}5$ claim \emph{transport-uncertified} (Table~\ref{tab:cert-filled}); admission is for the $q{=}2$ scientific claim only. \\
+Scope note & The economic claim remains \emph{cost-dominated} and the $q{=}5$ claim \emph{transport-uncertified} (Table~\ref{tab:cert-filled}); admission is for the $q{=}2$ scientific claim only, at $W{=}120$, and across the calendar-and-volume scheme scope only. The recentering constants are post-freeze and exploratory-grade; a confirmatory rerun is required before this certificate could support deployment. \\
 \bottomrule
 \end{tabularx}
 \end{threeparttable}
