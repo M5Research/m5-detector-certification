@@ -1,0 +1,282 @@
+{
+  "run_date": "20260605_134054",
+  "prereg_commit": "dd44e7a16e79702a232bec30fa90428b158c7c3e",
+  "phase8_amendment_ref": "07-PREREGISTRATION.md \u00a7D-07 operationalization (D-08 commit dd44e7a16e79702a232bec30fa90428b158c7c3e)",
+  "data_span": {
+    "start": "2021-05-29",
+    "end": "2025-12-31",
+    "n_bars": 2415148,
+    "year_2026_loaded": false,
+    "first_ts": "2021-05-29 19:32:00+00:00",
+    "last_ts": "2025-12-31 23:59:00+00:00"
+  },
+  "label_provenance": {
+    "detector": "RollingQuantileDetector",
+    "params": {
+      "rv_window": 60,
+      "pct_window": 43200,
+      "p_elevated": 0.75,
+      "p_extreme": 0.95
+    },
+    "n_warmup": 43258,
+    "n_LOW": 1782354,
+    "n_ELEVATED": 460821,
+    "n_EXTREME": 128715,
+    "first_valid_bar": 43258
+  },
+  "append_spike_sc1_passed": true,
+  "mde": {
+    "n_nl": 19766,
+    "alpha": 0.05,
+    "power_target": 0.8,
+    "ncp_needed": 7.848860509326197,
+    "mde_partial_r2": 0.00039693134931365255,
+    "crit_chi2_1": 3.841458820694124
+  },
+  "per_wq": [
+    {
+      "W": 60,
+      "q": 5,
+      "is_primary": false,
+      "n_nl": 39532,
+      "L_newey_west_primary": 15,
+      "L_newey_west_robustness": 34,
+      "degeneracy": {
+        "rank": 6,
+        "cond": 33.25951122455973,
+        "degenerate": false
+      },
+      "fallback_used": false,
+      "skipped": false,
+      "skip_reason": null,
+      "min_sep_filter": {
+        "n_transitions_before": 465,
+        "n_UP_before": 227,
+        "n_DOWN_before": 238,
+        "n_UP_after": 227,
+        "n_DOWN_after": 238,
+        "n_transitions_after": 465,
+        "under_powered": false,
+        "n_transitions_UP": 227,
+        "n_transitions_DOWN": 238
+      },
+      "delta_r2": 0.00014813439525795946,
+      "beta_T": 0.019728961406508573,
+      "beta_T_ci_lo": 0.003200621748109527,
+      "beta_T_ci_hi": 0.03648506880481546,
+      "beta_T_ci_block": 60,
+      "beta_T_ci_n_boot": 2000,
+      "effect_size_thresholds_met": {
+        "delta_r2_gte_0005": false,
+        "abs_beta_T_gte_001": true,
+        "both": false
+      },
+      "cell_passes_full_conjunction": false,
+      "wald_chi2_1": {
+        "statistic": 5.291535705417305,
+        "pvalue_uncorrected": 0.02142931476817325,
+        "df": 1,
+        "lag_L": 15
+      },
+      "wald_chi2_1_robustness": {
+        "statistic": 5.37924373174809,
+        "pvalue_uncorrected": 0.020377709660360295,
+        "df": 1,
+        "lag_L": 34
+      },
+      "r2_level": null,
+      "r2_transition": null
+    },
+    {
+      "W": 120,
+      "q": 5,
+      "is_primary": true,
+      "n_nl": 19766,
+      "L_newey_west_primary": 12,
+      "L_newey_west_robustness": 27,
+      "degeneracy": {
+        "rank": 6,
+        "cond": 32.70415485453703,
+        "degenerate": false
+      },
+      "fallback_used": false,
+      "skipped": false,
+      "skip_reason": null,
+      "min_sep_filter": {
+        "n_transitions_before": 235,
+        "n_UP_before": 109,
+        "n_DOWN_before": 126,
+        "n_UP_after": 109,
+        "n_DOWN_after": 126,
+        "n_transitions_after": 235,
+        "under_powered": false,
+        "n_transitions_UP": 109,
+        "n_transitions_DOWN": 126
+      },
+      "delta_r2": 0.000371596501657967,
+      "beta_T": 0.023824904440542777,
+      "beta_T_ci_lo": 0.004276905711472341,
+      "beta_T_ci_hi": 0.043479812420103424,
+      "beta_T_ci_block": 120,
+      "beta_T_ci_n_boot": 2000,
+      "effect_size_thresholds_met": {
+        "delta_r2_gte_0005": false,
+        "abs_beta_T_gte_001": true,
+        "both": false
+      },
+      "cell_passes_full_conjunction": false,
+      "wald_chi2_1": {
+        "statistic": 5.54565644012464,
+        "pvalue_uncorrected": 0.01852660664692419,
+        "df": 1,
+        "lag_L": 12
+      },
+      "wald_chi2_1_robustness": {
+        "statistic": 5.689183285890591,
+        "pvalue_uncorrected": 0.017069797142581656,
+        "df": 1,
+        "lag_L": 27
+      },
+      "r2_level": null,
+      "r2_transition": null
+    },
+    {
+      "W": 240,
+      "q": 15,
+      "is_primary": false,
+      "n_nl": 9883,
+      "L_newey_west_primary": 11,
+      "L_newey_west_robustness": 21,
+      "degeneracy": {
+        "rank": 6,
+        "cond": 32.27810815818962,
+        "degenerate": false
+      },
+      "fallback_used": false,
+      "skipped": false,
+      "skip_reason": null,
+      "min_sep_filter": {
+        "n_transitions_before": 120,
+        "n_UP_before": 48,
+        "n_DOWN_before": 72,
+        "n_UP_after": 48,
+        "n_DOWN_after": 72,
+        "n_transitions_after": 120,
+        "under_powered": true,
+        "n_transitions_UP": 48,
+        "n_transitions_DOWN": 72
+      },
+      "delta_r2": 0.0001882914159989646,
+      "beta_T": 0.022859855423391494,
+      "beta_T_ci_lo": -0.010070214667426976,
+      "beta_T_ci_hi": 0.056759137737044246,
+      "beta_T_ci_block": 240,
+      "beta_T_ci_n_boot": 2000,
+      "effect_size_thresholds_met": {
+        "delta_r2_gte_0005": false,
+        "abs_beta_T_gte_001": true,
+        "both": false
+      },
+      "cell_passes_full_conjunction": false,
+      "wald_chi2_1": {
+        "statistic": 1.967514311610406,
+        "pvalue_uncorrected": 0.1607119511206252,
+        "df": 1,
+        "lag_L": 11
+      },
+      "wald_chi2_1_robustness": {
+        "statistic": 1.9076193288397152,
+        "pvalue_uncorrected": 0.16722794741103716,
+        "df": 1,
+        "lag_L": 21
+      },
+      "r2_level": null,
+      "r2_transition": null
+    }
+  ],
+  "holm_correction": {
+    "family_size": 3,
+    "ordered": [
+      {
+        "wq": [
+          120,
+          5
+        ],
+        "p_uncorrected": 0.01852660664692419,
+        "holm_adjusted": 0.05557981994077257,
+        "rank": 1
+      },
+      {
+        "wq": [
+          60,
+          5
+        ],
+        "p_uncorrected": 0.02142931476817325,
+        "holm_adjusted": 0.05557981994077257,
+        "rank": 2
+      },
+      {
+        "wq": [
+          240,
+          15
+        ],
+        "p_uncorrected": 0.1607119511206252,
+        "holm_adjusted": 0.1607119511206252,
+        "rank": 3
+      }
+    ],
+    "primary_wq_holm_adjusted": 0.05557981994077257
+  },
+  "disposition": "A KILLED",
+  "disposition_rule_applied": "D-07: primary (120,5) passes full conjunction AND >= 2/3 cells pass; PROPOSED only \u2014 human ratification required (Task 3)",
+  "disposition_detail": {
+    "disposition": "A KILLED",
+    "primary_passes": false,
+    "n_cells_passing": 0,
+    "rule": "D-07: primary (120,5) full conjunction AND >= 2/3 cells"
+  },
+  "frozen_params": {
+    "wq_grid": [
+      [
+        60,
+        5
+      ],
+      [
+        120,
+        5
+      ],
+      [
+        240,
+        15
+      ]
+    ],
+    "primary_wq": [
+      120,
+      5
+    ],
+    "lag_L_primary_formula": "int(4 * (n_nl / 100) ** (2/9))",
+    "lag_L_robustness_formula": "int(n_nl ** (1/3))",
+    "lag_L_primary_at_n_nl_primary": 12,
+    "lag_L_robustness_at_n_nl_primary": 27,
+    "delta_r2_threshold": 0.005,
+    "beta_t_threshold": 0.01,
+    "holm_family_size": 3,
+    "min_sep_W": true,
+    "under_powered_n": 50,
+    "degeneracy_rank_check": true,
+    "degeneracy_cond_threshold": 10000000000.0
+  },
+  "provenance": {
+    "freeze_commit": "720c1d4",
+    "phase8_amendment_ref": "07-PREREGISTRATION.md \u00a7D-07 operationalization (D-08 commit dd44e7a16e79702a232bec30fa90428b158c7c3e)",
+    "prereg_commit": "dd44e7a16e79702a232bec30fa90428b158c7c3e",
+    "boot_seed": 43,
+    "code_commit": "92cd3d38776fb4f959ce5dfdbb47b459dd0cd20c",
+    "library_versions": {
+      "numpy": "2.4.4",
+      "scipy": "1.17.1",
+      "statsmodels": "0.14.6"
+    },
+    "run_ts": "2026-06-05T13:40:54.868415+00:00"
+  }
+}
