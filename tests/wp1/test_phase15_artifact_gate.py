@@ -8,6 +8,9 @@ import pytest
 
 from backtest.utils import PROJECT_ROOT
 
+# Reads the committed artifacts, so it is part of `pytest -m artifact`.
+pytestmark = pytest.mark.artifact
+
 INJECTION_DIR = PROJECT_ROOT / "data" / "injection_runs"
 THERMO_DIR = PROJECT_ROOT / "backtest_results" / "thermodynamic_bound"
 GAUGE_REPORT = (

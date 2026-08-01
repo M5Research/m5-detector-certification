@@ -32,6 +32,8 @@ References
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 
 
@@ -372,9 +374,17 @@ def beta_t_boot_ci(
 
     lo = float(np.quantile(boots, alpha / 2))
     hi = float(np.quantile(boots, 1 - alpha / 2))
-    # Ensure CI contains the point estimate (clamp to lo <= point <= hi)
-    lo = min(lo, point)
-    hi = max(hi, point)
+    # NOT clamped to contain the point estimate. A percentile interval that
+    # excludes its own point estimate indicates bootstrap bias; clamping it
+    # distorts the nominal coverage and hides the diagnostic.
+    if not (lo <= point <= hi):
+        warnings.warn(
+            f"percentile CI [{lo:.6g}, {hi:.6g}] excludes its point estimate "
+            f"{point:.6g}; this indicates bootstrap bias in beta_T and the "
+            "interval should be read accordingly",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     return point, lo, hi
 
 
@@ -511,6 +521,16 @@ def apply_holm(
     3. Enforce step-down monotonicity: adjusted[i] >= adjusted[i-1] in sorted order.
     4. Return in original input order.
     """
+    if len(pvalues) > family_size:
+        raise ValueError(
+            f"Holm family size is frozen at {family_size} but {len(pvalues)} "
+            "p-values were supplied. Enlarging a frozen multiplicity "
+            "denominator after the freeze is a pre-registration violation "
+            "(v3.0 §8), and with more p-values than the denominator the "
+            "multiplier (family_size - rank) reaches zero and silently "
+            "returns adjusted p-values of 0."
+        )
+
     k = family_size
     order = sorted(range(len(pvalues)), key=lambda i: pvalues[i])
     adjusted = [0.0] * len(pvalues)

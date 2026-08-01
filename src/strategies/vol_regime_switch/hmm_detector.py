@@ -1,8 +1,23 @@
-"""Causal HMM Markov-switching volatility-regime detector.
+"""HMM Markov-switching volatility-regime detector (anchored full-sample fit).
 
 Implements the ROBUSTNESS detector specified in 01-PREREGISTRATION.md §7.2
 (frozen at commit 169fc20) with the §14.5 HMM amendment bundle (D-02/D-03/D-06,
 2026-06-02).
+
+CAUSALITY SCOPE — read before citing this detector as causal.
+  Inference is causal GIVEN THE PARAMETERS: labels come from
+  `filtered_marginal_probabilities` (the Hamilton forward filter) and never
+  from the Kim smoother. The parameters themselves are not causal. The EM fit
+  (means, switching variances, transition matrix), the ascending-variance state
+  ordering, and the log-domain floor are each estimated ONCE over the full
+  sample. A label at bar t therefore depends on data after t, through the
+  fitted parameters.
+
+  This is the standard anchored full-sample Markov-switching convention and it
+  is an acceptable choice for a frozen measurement instrument, which is how the
+  manuscript uses it. It is NOT a real-time causal detector, and it must not be
+  used to evaluate out-of-sample predictability without refitting on an
+  expanding window with the state ordering fixed by the first window.
 
 Frozen primary parameters:
   rv_window=60, k_regimes=3, em_iter=100, search_reps=10, ewma=False,
@@ -242,7 +257,17 @@ class HMMDetector:
         any_persistent_conv = any(conv_flags)
         convergence_ok = (spread_frac < 0.01) and not any_persistent_conv
 
-        # Best restart = highest LL among successful (non-None) restarts
+        # Best restart = highest LL among successful (non-None) restarts.
+        # Restarts that raised are already recorded as -inf, but a restart that
+        # "succeeds" while returning a NaN log-likelihood is not: np.argmax
+        # returns the index of the first NaN it sees, which would select a
+        # degenerate fit as the best one. Demote NaN to -inf first.
+        ll_arr = np.where(np.isnan(ll_arr), -np.inf, ll_arr)
+        if not np.any(np.isfinite(ll_arr)):
+            raise RuntimeError(
+                "All HMM EM restarts returned a non-finite log-likelihood. "
+                "The input series may be too short, flat, or degenerate."
+            )
         best_idx = int(np.argmax(ll_arr))
         best_res = results_list[best_idx]
         if best_res is None:
@@ -257,11 +282,16 @@ class HMMDetector:
                     "The input series may be too short, flat, or degenerate."
                 )
 
-        # Step 5: runtime hasattr assertion (§7.2 — required per statsmodels stability note)
-        assert hasattr(best_res, "filtered_marginal_probabilities"), (
-            "statsmodels API: filtered_marginal_probabilities not found on result object. "
-            "statsmodels has flagged this module as 'not guaranteed stable' (§7.2)."
-        )
+        # Step 5: runtime API check (§7.2 — required per statsmodels stability
+        # note). Not an assert: this guards against a third-party API change at
+        # runtime, and `python -O` strips asserts, which would turn a clear
+        # failure into an AttributeError further down.
+        if not hasattr(best_res, "filtered_marginal_probabilities"):
+            raise RuntimeError(
+                "statsmodels API: filtered_marginal_probabilities not found on "
+                "the result object. statsmodels has flagged this module as "
+                "'not guaranteed stable' (§7.2)."
+            )
 
         # Step 6: variance-ascending relabeling (RESEARCH.md PQ-6 / D-08)
         param_names = best_res.model.param_names

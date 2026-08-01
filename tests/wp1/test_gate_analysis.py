@@ -141,7 +141,31 @@ def test_epsilon_sq_boot_ci() -> None:
     assert np.isfinite(point), "point estimate must be finite"
     assert np.isfinite(lo), "CI lower bound must be finite"
     assert np.isfinite(hi), "CI upper bound must be finite"
-    assert lo <= point <= hi, f"CI order violated: lo={lo}, point={point}, hi={hi}"
+    assert lo < hi, f"CI is not ordered: lo={lo}, hi={hi}"
+
+    # NOT `lo <= point <= hi`. epsilon_sq_boot_ci used to clamp its bounds to
+    # contain the point estimate, and this test asserted the clamped ordering.
+    # With the clamp removed, this fixture shows what the clamp was hiding: the
+    # point estimate is ~0.8888 while the percentile interval is
+    # ~[0.8499, 0.8886], so the point sits just ABOVE the upper bound.
+    #
+    # That is a genuine, reproducible downward bias, not a defect. epsilon^2 is
+    # bounded above by 1; these three groups are well separated, so the
+    # statistic sits near its ceiling and block resampling can essentially only
+    # move it down. The percentile interval is biased low in exactly the regime
+    # where the statistic is most informative.
+    #
+    # Clamping made the numbers look orderly and suppressed the diagnostic. The
+    # honest assertions are that the bias is present, that it is small, and that
+    # the function warns when it happens.
+    assert point > hi, (
+        "expected the known downward bootstrap bias for a near-ceiling "
+        f"epsilon^2; got point={point}, hi={hi}. If this starts passing "
+        "cleanly the estimator changed and the bias note needs revisiting."
+    )
+    assert (point - hi) / point < 0.01, (
+        f"downward bias exceeded 1% of the point estimate: point={point}, hi={hi}"
+    )
 
     # Pitfall-1: joint resampling — point must equal _epsilon_sq_kw exactly
     kw_point = _epsilon_sq_kw(pred_nl, regime_nl)

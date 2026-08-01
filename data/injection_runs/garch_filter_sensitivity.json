@@ -1,0 +1,38 @@
+{
+  "probe": "garch_filter_sensitivity",
+  "primary_cell": {
+    "delta": 0.15,
+    "q": 5,
+    "W": 120
+  },
+  "variants": [
+    {
+      "variant": "garch",
+      "sigma_mode": "garch",
+      "delta": 0.15,
+      "q": 5,
+      "W": 120,
+      "phi": 0.10008912836807345,
+      "N_mc": 50,
+      "P_det": 0.0,
+      "ci_95_lo": 0.0,
+      "ci_95_hi": 0.06977703074953864
+    },
+    {
+      "variant": "constant_median",
+      "sigma_mode": "constant_median",
+      "delta": 0.15,
+      "q": 5,
+      "W": 120,
+      "phi": 0.10008912836807345,
+      "N_mc": 50,
+      "P_det": 0.0,
+      "ci_95_lo": 0.0,
+      "ci_95_hi": 0.06977703074953864
+    }
+  ],
+  "provenance": {
+    "exploratory_addendum": true,
+    "timestamp": "2026-06-23T12:54:45.777426Z"
+  }
+}

@@ -22,6 +22,20 @@ freeze_v4_short=1dc5c82
 freeze_v4_unix=1781205673
 freeze_v4_utc=2026-06-11T19:21:13Z
 freeze_v4_subject=FREEZE: v4.0 pre-registration (09-PREREGISTRATION.md)
+freeze_v4_path=.planning/phases/11-signal-injection-the-ligo-calibration/09-PREREGISTRATION.md
+freeze_v4_published_as=prereg/PREREGISTRATION-v4.0-freeze-1dc5c82.md
+
+# Post-freeze exploratory addendum. NOT a freeze: its first commit also adds
+# five of its own eight result artifacts, so the commit ordering does not
+# establish that it predates its runs. See the ordering disclosure in its
+# header. No manuscript claim treats these cells as confirmatory.
+addendum_exploratory_commit=9daf99338a21b0949f9080bb7be01082e2b03dae
+addendum_exploratory_utc=2026-06-22T11:37:02Z
+addendum_exploratory_path=.planning/phases/15-integration-paper/15-EXPLORATORY-ADDENDUM-PREREG.md
+addendum_exploratory_published_as=prereg/EXPLORATORY-ADDENDUM-PREREG.md
+confirmatory_grid_committed=58226a9559f3c11ff06b636cc50fdb4b1d57143f
+confirmatory_grid_committed_utc=2026-06-15T15:45:55Z
+confirmatory_grid_committed_subject=feat(wp1): publish injection grid artifacts
 
 # Cited runs (UTC), each recorded in its own artifact under backtest_results/.
 # The cited freeze is the commit named in that artifact's provenance block.

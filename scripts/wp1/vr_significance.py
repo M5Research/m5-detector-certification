@@ -18,6 +18,8 @@ Frozen constants (consumed, never recomputed):
 """
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 
 # ---------------------------------------------------------------------------
@@ -87,6 +89,14 @@ def compute_rolling_vr_and_z(
         )
 
     log_close = np.log(close)
+    # r_full[0] is not a return: there is no price before the first bar. It is
+    # set to 0.0 rather than dropped so that r_full indexes align with close,
+    # which the window arithmetic downstream relies on. The cost is that the
+    # first window of width W contains one artificial zero, very slightly
+    # deflating its variance. With W=120 over ~2.4M bars this affects 1 of
+    # ~20126 non-overlapping windows and no reported figure moves, but it is a
+    # known contaminant rather than a neutral convention. See
+    # prereg/DEVIATIONS.md.
     r_full = np.empty(N, dtype=np.float64)
     r_full[0] = 0.0
     r_full[1:] = np.diff(log_close)
@@ -120,6 +130,14 @@ def compute_rolling_vr_and_z_strided(
         )
     step = W if stride is None else stride
     log_close = np.log(close)
+    # r_full[0] is not a return: there is no price before the first bar. It is
+    # set to 0.0 rather than dropped so that r_full indexes align with close,
+    # which the window arithmetic downstream relies on. The cost is that the
+    # first window of width W contains one artificial zero, very slightly
+    # deflating its variance. With W=120 over ~2.4M bars this affects 1 of
+    # ~20126 non-overlapping windows and no reported figure moves, but it is a
+    # known contaminant rather than a neutral convention. See
+    # prereg/DEVIATIONS.md.
     r_full = np.empty(N, dtype=np.float64)
     r_full[0] = 0.0
     r_full[1:] = np.diff(log_close)
@@ -168,7 +186,9 @@ def median_vr_dep_boot_ci(
     -----
     Uses np.random.default_rng(seed) exclusively (determinism guarantee).
     The legacy seeding API (np.random.seed) is not used in this module.
-    The CI is clamped to contain the point estimate (lo <= point <= hi).
+    The CI is NOT clamped to contain the point estimate. If the percentile
+    interval excludes it, that indicates bootstrap bias and the function
+    emits a RuntimeWarning rather than silently widening the interval.
     """
     pred_nl = np.asarray(pred_nl, dtype=np.float64)
     n = len(pred_nl)
@@ -194,9 +214,19 @@ def median_vr_dep_boot_ci(
 
     lo = float(np.quantile(boots, alpha / 2))
     hi = float(np.quantile(boots, 1 - alpha / 2))
-    # Clamp CI to contain the point estimate
-    lo = min(lo, point)
-    hi = max(hi, point)
+    # NOT clamped to contain the point estimate. A percentile interval that
+    # excludes its own point estimate is a signal of bootstrap bias, and
+    # clamping it away distorts the nominal coverage while hiding exactly the
+    # problem it is reacting to. If this fires, that is the finding.
+    if not (lo <= point <= hi):
+        warnings.warn(
+            f"percentile CI [{lo:.6g}, {hi:.6g}] excludes its point estimate "
+            f"{point:.6g}; this indicates bootstrap bias and the interval "
+            "should be read with that in mind (a BCa interval would be the "
+            "principled fix)",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     return point, lo, hi
 
 
@@ -260,12 +290,30 @@ def compute_vr_significance(
     # Closure threshold: 0.001 consumed verbatim from §7 (never recomputed)
     closed = bool(median_vr_dep < 0.001)
 
+    # `p_twotailed` is the frozen trigger's reference tail probability, NOT a
+    # calibrated p-value, and the name is retained only because it is the key
+    # in every published artifact.
+    #
+    # It evaluates the standard normal tail at the MEDIAN of n window-level z
+    # statistics, as if that median were itself N(0,1). It is not: the median
+    # of n draws has SE ~= 1.2533/sqrt(n), so at n = 20126 the correct scale is
+    # about 0.0088, not 1. An observed median of -0.1819 is roughly 20 SE from
+    # zero, while this quantity reports 0.856.
+    #
+    # As a frozen decision rule that is legitimate: the detector is whatever it
+    # is, and its calibration is established by injection, which is exactly what
+    # the power grid does. What is not legitimate is reading the number as a
+    # p-value. The mis-centred and mis-scaled asymptotic reference IS the
+    # paper's size-gate finding. `median_se_approx` and the note below are
+    # emitted so the artifact carries that caveat with the number.
     if len(finite_z) == 0:
         p_twotailed = float("nan")
         median_z_m2 = float("nan")
+        median_se_approx = float("nan")
     else:
         median_z_m2 = float(np.median(finite_z))
         p_twotailed = 2.0 * float(norm.sf(abs(median_z_m2)))
+        median_se_approx = 1.2533141373155003 / float(np.sqrt(len(finite_z)))
 
     return {
         "median_vr_dep": median_vr_dep,
@@ -273,6 +321,14 @@ def compute_vr_significance(
         "n_nl": int(len(finite_pred)),
         "closed": closed,
         "p_twotailed": p_twotailed,
+        "median_se_approx": median_se_approx,
+        "p_twotailed_note": (
+            "Tail probability of the frozen asymptotic reference, not a "
+            "calibrated p-value: it treats the median of n window-level z "
+            "statistics as N(0,1), whereas that median has SE ~= "
+            "1.2533/sqrt(n) (see median_se_approx). The calibrated reference "
+            "is the empirical null in empirical_vr_null.py."
+        ),
         "median_z_m2": median_z_m2,
     }
 
@@ -498,6 +554,19 @@ def compute_mde_vr(
         z_beta       = norm.ppf(power)           # 0.842 at power=0.80
         se_vr_dep    = 1 / sqrt(n_nl)           # approx SE of median |VR-1| under H0
         MDE          = (z_alpha_half + z_beta) * se_vr_dep
+
+    LIMITATION OF THIS CONVENTION, declared rather than silently inherited.
+    `1/sqrt(n_nl)` assumes the underlying statistic has unit dispersion. The
+    standard error of a median is `1.2533 * sigma / sqrt(n)`, so unless
+    `sigma * 1.2533 == 1` this is an order-of-magnitude device, not a
+    calibrated standard error. The gauge report's own bootstrap SE for the same
+    quantity is ~0.0088 at n=20126, against 1/sqrt(20126) = 0.0070.
+
+    The convention is kept because the pre-registration froze THIS convention,
+    defects included, and because changing it now would itself be an undeclared
+    deviation. It matters more than it used to: since the transport margin was
+    restored to the pre-registered MDE, this formula sets a decision threshold
+    rather than only a diagnostic. See prereg/DEVIATIONS.md D1.
 
     Parameters
     ----------

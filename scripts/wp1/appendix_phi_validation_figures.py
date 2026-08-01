@@ -29,7 +29,10 @@ from backtest.utils import PROJECT_ROOT  # noqa: E402
 from scripts.wp1.signal_injector import phi_to_delta_mapping  # noqa: E402
 
 INJECTION_DIR = PROJECT_ROOT / "data" / "injection_runs"
-V4_FIGURE_DIR = PROJECT_ROOT / "docs" / "research" / "calibrated-detector-exclusion"
+# Was PROJECT_ROOT/"docs"/"research"/"calibrated-detector-exclusion", a path in
+# the private development repository that does not exist here, so any run using
+# the default output directory wrote outside the published tree.
+V4_FIGURE_DIR = PROJECT_ROOT / "paper" / "figures"
 Q_COLORS = {2: "#1f77b4", 5: "#ff7f0e", 15: "#2ca02c", 60: "#d62728"}
 
 

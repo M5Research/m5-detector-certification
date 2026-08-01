@@ -8,15 +8,37 @@ Run commands from the repository root unless a section says otherwise. The manus
 
 Raw Binance futures data are used only through local repository artifacts. Data redistribution remains subject to the original venue and vendor terms.
 
+## Install
+
+```bash
+pip install -e ".[dev]"
+```
+
+installs from the package metadata, which is the authoritative dependency
+list. `requirements.txt` mirrors it. `uv sync --frozen --extra dev` works
+against the committed `uv.lock`.
+
+Then:
+
+```bash
+pytest              # full suite
+pytest -m artifact  # validate the frozen artifacts only
+```
+
 ## Build Manuscript
 
-Run from `docs/research/gauge-calibrated-detector-exclusion/`:
+Run from `paper/`:
 
-```powershell
+```bash
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 bibtex main
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
 pdflatex -interaction=nonstopmode -halt-on-error main.tex
+```
+
+On Windows, check the log for problems with:
+
+```powershell
 Select-String -Path main.log -Pattern 'undefined|Overfull|LaTeX Error|Emergency stop|Fatal error|Warning: Citation'
 ```
 

@@ -248,6 +248,13 @@ def estimate_mi_from_returns(
         n_pairs = len(x)
         sample_size = min(n_pairs, BOOTSTRAP_PAIR_SAMPLE_SIZE)
         if n_pairs > BOOTSTRAP_PAIR_SAMPLE_SIZE:
+            # The point estimate uses a subsample of BOOTSTRAP_PAIR_SAMPLE_SIZE
+            # pairs even when far more are available (~2.4M at 1-minute bars).
+            # Deterministic, but it discards precision for no statistical
+            # reason. Note the asymmetry below: the standard error is
+            # bootstrapped from the FULL pair set while the point estimate uses
+            # the subsample, so the two do not describe the same n. Raise the
+            # cap, or subsample both, if this estimate becomes load-bearing.
             rng = np.random.default_rng(seed)
             idx = rng.choice(n_pairs, size=sample_size, replace=False)
             x_est = x[idx]

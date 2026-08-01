@@ -2,6 +2,24 @@
 
 This ledger records existing artifacts that can seed the GCDE paper. Paths are relative to the repository root.
 
+## Digest convention
+
+All SHA-256 digests in this ledger are computed over the file bytes **as
+committed, with LF line endings**, which `.gitattributes` now enforces on every
+platform. Verify with:
+
+```bash
+shasum -a 256 backtest_results/asset_replication/eth_replication_20260625_224506.json
+```
+
+or, on Windows, `Get-FileHash -Algorithm SHA256 <path>` from a fresh clone.
+
+Digests published before 2026-08-01 were computed against a Windows working
+tree in which `core.autocrlf` had rewritten LF to CRLF, and so did not verify
+on Linux or macOS. They have been recomputed against the committed bytes.
+`tests/wp1/test_frozen_artifacts.py` now checks every digest in this file on
+each CI run, so the ledger and the artifacts cannot drift apart again.
+
 ## Verification Pass
 
 Checked on 2026-06-26 against the repository working tree. All file-path artifacts cited in this ledger were found. Inline numeric values below were re-read from the cited JSON artifacts; rounded prose values match the source artifacts at the precision shown.
@@ -28,6 +46,12 @@ Checked on 2026-06-26 against the repository working tree. All file-path artifac
 | `data/injection_runs/inj_d0.2_q5_W120.json` | Existing Monte Carlo injection cell | Extends the `q=5` silent region. |
 | `data/injection_runs/inj_d0.3_q5_W120.json` | Existing Monte Carlo injection cell | Demonstrates `P_det=1.0` at higher `q=5` amplitude. |
 | `scripts/wp1/signal_injection.py` | Existing injection orchestrator | Basis for a reusable detector response-surface estimator. |
+| `data/injection_runs/phi_grid.json` | Amplitude-to-AR(1) mapping | Translates target `delta` amplitudes to injected `phi`; without it the injection design is not auditable. |
+| `data/injection_runs/phi_grid_addendum.json` | Same, exploratory amplitudes | Covers the post-freeze `delta >= 0.15` extension. |
+| `data/injection_runs/garch_filter_sensitivity.json` | Filter-sensitivity check | Backs the GARCH/EWMA sigma_t robustness statement. |
+| `data/injection_runs/negative_phi_probe_primary.json` | Negative-phi probe | Negative control for the positive-only signal family. |
+| `backtest_results/gauge_invariance/gauge_report_mde_margin.json` | Transport gate under the preregistered MDE margin | Produced by `scripts/wp1/migrate_gauge_mde_margin.py` from the frozen diffs and standard errors; see `prereg/DEVIATIONS.md` D1. |
+| `scripts/wp1/reference_repair.py` | Generator for the §4.8 repair | Implements the recentering and audits the frozen artifact; see `prereg/DEVIATIONS.md` D14. |
 | `scripts/wp1/exclusion_plot.py` | Existing plotting/table script | Should be reframed from exclusion plot to response-surface plot. |
 | `tests/wp1/test_phase15_artifact_gate.py` | Existing artifact checks | Useful as provenance and schema guardrails. |
 
@@ -35,10 +59,16 @@ Current evidence anchors:
 
 | Cell | Fires | `P_det` | 95% CI |
 |---|---:|---:|---|
-| `delta=0.15, q=2, W=120` | `200/200` | `1.0` | `[0.9818, 1.0]` |
-| `delta=0.15, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0182]` |
-| `delta=0.20, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0182]` |
-| `delta=0.30, q=5, W=120` | `200/200` | `1.0` | `[0.9818, 1.0]` |
+| `delta=0.15, q=2, W=120` | `200/200` | `1.0` | `[0.9817, 1.0]` |
+| `delta=0.15, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0183]` |
+| `delta=0.20, q=5, W=120` | `0/200` | `0.0` | `[0.0, 0.0183]` |
+| `delta=0.30, q=5, W=120` | `200/200` | `1.0` | `[0.9817, 1.0]` |
+
+Intervals are exact Clopper-Pearson, migrated from a uniform-prior Bayesian
+interval on 2026-08-01; see `prereg/DEVIATIONS.md` D10. Library versions are
+not uniform across cells: the 96 confirmatory cells and two exploratory cells
+ran under numpy 2.4.4, the remaining six exploratory cells under 1.26.4. Each
+cell records its own `library_versions`.
 
 Interpretation for GCDE:
 
@@ -127,6 +157,7 @@ Gauge defect is a measured property of the detector-market pair, not a prose cav
 | `tests/wp1/test_vr_detector_mi.py` | New tests | Guards zero-entropy behavior for saturated injection cells. |
 | `scripts/wp1/thermodynamic_bound.py` | Existing information-cost script | Refactor toward detector-output inputs. |
 | `scripts/wp1/mutual_information.py` | Existing MI estimators | Reuse estimator infrastructure. |
+| `backtest_results/thermodynamic_bound/mi_bootstrap_sensitivity.json` | Resampling-sensitivity probe for the sign-pair MI | Not cited by the manuscript. Its `production_reference.mi_nats` for `q=5` is `0.0016658`, against `0.0020490` in `thermo_report_20260624_082448.json`. The two are not inconsistent: the sign-pair MI point estimate is computed on a 50,000-pair subsample of ~2.4M available pairs (see `mutual_information.py`), so different call paths draw different subsamples. The gap is `0.00038` against a reported standard error of `0.00031`, i.e. about 1.25 SE, and the probe's own resampling rows (`0.00184`-`0.00216`) bracket the thermo value. Recorded here so the discrepancy is explained rather than discovered. |
 | `tests/wp1/test_thermodynamic_bound.py` | Existing tests | Keep cost-bound and graceful-degradation tests. |
 
 Existing raw sign-pair result:
@@ -191,7 +222,7 @@ Existing ETHUSDT summary:
 | Information-cost | Raw sign-pair `q=5` gross bound `9.21` bps; no ETH-specific injection grid |
 | Persistence | `KS=0.2605`, bootstrap `p=0.0` |
 | Holdout primary cell | `|VR(5)-1|=0.1568`, median `Z_m,5=-0.3126`, `p=0.7546` |
-| SHA256 | `CFD31CEBD10797FC12F120A593B99E22DC1820416A50E7357D08459B3A7155EF` |
+| SHA256 of `backtest_results/asset_replication/eth_replication_20260625_224506.json` | `20E434D33C019FF6E737B992E789131C11D446F07EFB978C49550D83649CB15E` |
 
 Interpretation for GCDE:
 

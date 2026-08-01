@@ -20,13 +20,48 @@ def synthetic_sigma_t(synthetic_returns):
     return fit_garch_sigma_t(synthetic_returns)
 
 def test_variance_preservation_phi_zero(synthetic_returns, synthetic_sigma_t):
-    # variance preservation: the AR(1) process eps has variance 1.
-    # so r_inj has variance var(returns) + var(sigma_t * eps)
-    r_inj = inject_ar1_autocorrelation(synthetic_returns, phi=0.0, seed=42, sigma_t=synthetic_sigma_t)
-    rng = np.random.default_rng(42)
-    expected_var = np.var(synthetic_returns) + np.var(synthetic_sigma_t * rng.normal(0, 1, 10000))
+    """At phi=0 the injected variance is the sum of the two components.
+
+    Stated as an observable property rather than by replaying the injector's
+    internal RNG. The previous version reconstructed
+    ``np.random.default_rng(42).normal(0, 1, 10000)`` and asserted against it,
+    which pinned the exact draw sequence inside the implementation: any
+    refactor that changed the call pattern broke the test even when the
+    semantics were unchanged, and a real change in injected variance could slip
+    through if the draws happened to line up.
+
+    The property: eps has unit variance and is independent of the returns, so
+    ``var(r_inj) = var(returns) + var(sigma_t * eps) ~= var(returns) +
+    E[sigma_t^2]``.
+    """
+    r_inj = inject_ar1_autocorrelation(
+        synthetic_returns, phi=0.0, seed=42, sigma_t=synthetic_sigma_t
+    )
+    expected_var = np.var(synthetic_returns) + np.mean(synthetic_sigma_t**2)
     var_ratio = np.var(r_inj) / expected_var
-    assert 0.99 <= var_ratio <= 1.01
+    assert 0.95 <= var_ratio <= 1.05, (
+        f"injected variance {np.var(r_inj):.6g} departs from the expected "
+        f"{expected_var:.6g} (ratio {var_ratio:.4f})"
+    )
+
+
+def test_injection_is_deterministic_given_a_seed(synthetic_returns, synthetic_sigma_t):
+    """Same seed reproduces exactly; a different seed does not.
+
+    This is the determinism guarantee the frozen protocol actually relies on,
+    and unlike an RNG replay it survives refactoring.
+    """
+    a = inject_ar1_autocorrelation(
+        synthetic_returns, phi=0.3, seed=42, sigma_t=synthetic_sigma_t
+    )
+    b = inject_ar1_autocorrelation(
+        synthetic_returns, phi=0.3, seed=42, sigma_t=synthetic_sigma_t
+    )
+    c = inject_ar1_autocorrelation(
+        synthetic_returns, phi=0.3, seed=43, sigma_t=synthetic_sigma_t
+    )
+    np.testing.assert_array_equal(a, b)
+    assert not np.array_equal(a, c)
 
 def test_variance_preservation_phi_nonzero(synthetic_returns, synthetic_sigma_t):
     # The variance should be invariant to phi because eps is orthogonalized

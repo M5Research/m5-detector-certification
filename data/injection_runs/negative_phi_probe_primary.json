@@ -1,0 +1,63 @@
+{
+  "probe": "negative_ar1_exploratory",
+  "description": "Direction-specific exclusion bound diagnostic",
+  "cells": [
+    {
+      "delta_target": 0.1,
+      "q": 5,
+      "W": 120,
+      "phi_positive_reference": 0.007304313343400476,
+      "phi_injected": -0.007304313343400476,
+      "injection_sign": "negative",
+      "N_mc": 50,
+      "n_fires": 0,
+      "P_det": 0.0,
+      "ci_95_lo": 0.0,
+      "ci_95_hi": 0.06977703074953864,
+      "median_z_q": -0.1563669754140966,
+      "provenance": {
+        "exploratory_addendum": true,
+        "negative_phi_probe": true,
+        "timestamp": "2026-06-23T12:34:27.754704Z"
+      }
+    },
+    {
+      "delta_target": 0.15,
+      "q": 5,
+      "W": 120,
+      "phi_positive_reference": 0.10008912836807345,
+      "phi_injected": -0.10008912836807345,
+      "injection_sign": "negative",
+      "N_mc": 50,
+      "n_fires": 0,
+      "P_det": 0.0,
+      "ci_95_lo": 0.0,
+      "ci_95_hi": 0.06977703074953864,
+      "median_z_q": -0.7456853520868925,
+      "provenance": {
+        "exploratory_addendum": true,
+        "negative_phi_probe": true,
+        "timestamp": "2026-06-23T12:53:53.385414Z"
+      }
+    },
+    {
+      "delta_target": 0.2,
+      "q": 5,
+      "W": 120,
+      "phi_positive_reference": 0.21089453720066212,
+      "phi_injected": -0.21089453720066212,
+      "injection_sign": "negative",
+      "N_mc": 50,
+      "n_fires": 0,
+      "P_det": 0.0,
+      "ci_95_lo": 0.0,
+      "ci_95_hi": 0.06977703074953864,
+      "median_z_q": -1.3229202086878054,
+      "provenance": {
+        "exploratory_addendum": true,
+        "negative_phi_probe": true,
+        "timestamp": "2026-06-23T13:08:11.519639Z"
+      }
+    }
+  ]
+}

@@ -40,13 +40,28 @@ def _median_row_for_q(pipeline: dict, q: int) -> dict:
 
 
 def _median_se_for_q(pipeline: dict, q: int) -> float:
+    """Standard error of the median |VR-1| for horizon q.
+
+    Kept byte-for-byte equivalent to `gauge_invariance._median_se_for_q`, whose
+    triple-returning signature differs but whose SE must not. The two copies
+    have diverged twice already — once on an unreachable return, and once here,
+    where absent ci_95 keys raised KeyError instead of falling back to
+    1/sqrt(n_nl). tests/wp1/test_duplicate_implementations_agree.py pins them
+    together.
+    """
     cell = _median_row_for_q(pipeline, q)
-    ci_lo = float(cell["ci_95_lo"])
-    ci_hi = float(cell["ci_95_hi"])
-    if not (math.isfinite(ci_lo) and math.isfinite(ci_hi) and ci_hi >= ci_lo):
-        n_nl = max(1, int(cell.get("n_nl", 0)))
+    ci_lo = cell.get("ci_95_lo")
+    ci_hi = cell.get("ci_95_hi")
+    if ci_lo is not None and ci_hi is not None:
+        ci_lo_f = float(ci_lo)
+        ci_hi_f = float(ci_hi)
+        if math.isfinite(ci_lo_f) and math.isfinite(ci_hi_f) and ci_hi_f >= ci_lo_f:
+            return float((ci_hi_f - ci_lo_f) / (2.0 * _NORM_Z_95))
+
+    n_nl = int(cell.get("n_nl", 0))
+    if n_nl > 0:
         return float(1.0 / math.sqrt(n_nl))
-    return float((ci_hi - ci_lo) / (2.0 * _NORM_Z_95))
+    return float("inf")
 
 
 def backfill_tost_ci(report: dict) -> dict:

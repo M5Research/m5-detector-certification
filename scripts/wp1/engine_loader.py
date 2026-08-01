@@ -10,7 +10,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import pytest
 from backtest.utils import PROJECT_ROOT  # noqa: E402
 
 from scripts.wp1.strategy_view import StrategyView
@@ -44,7 +43,17 @@ def _engine_search_paths() -> list[Path]:
 
 
 def import_engine() -> Any:
-    """Import and return the _backtest_engine module, or skip the test if unavailable."""
+    """Import and return the _backtest_engine module.
+
+    Raises ImportError if the C++ extension is not built. Callers that are
+    tests should wrap this in ``pytest.importorskip``-style handling of their
+    own; this module previously called ``pytest.skip()`` directly, which
+    raised a pytest control-flow exception out of a production code path
+    whenever it ran outside a test session.
+
+    The extension lives in the private development repository and is not
+    required to reproduce any value in the paper.
+    """
     _add_msys_dll_path()
     for d in _engine_search_paths():
         if str(d) not in sys.path:
@@ -52,7 +61,11 @@ def import_engine() -> Any:
     try:
         import _backtest_engine as engine_mod  # type: ignore[import-not-found]
     except ImportError as exc:  # pragma: no cover - environment dependent
-        pytest.skip(f"_backtest_engine not built/importable: {exc}")
+        raise ImportError(
+            "_backtest_engine is not built or importable. It ships with the "
+            "private development repository and is not needed to reproduce "
+            f"any published result. Original error: {exc}"
+        ) from exc
     return engine_mod
 
 

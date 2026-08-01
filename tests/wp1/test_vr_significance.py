@@ -405,14 +405,21 @@ def test_holm_family_size_4() -> None:
         f"Holm-4 smallest adjusted should be 0.04, got {adjusted[smallest_idx]:.6f}"
     )
 
-    # Confirm family_size=3 would give a DIFFERENT (smaller) result for the smallest p-value:
-    # With family_size=3: adjusted_smallest = min(1.0, 0.01 * (3 - 0)) = 0.03
+    # Correcting these same 4 p-values against a family of 3 is not a
+    # legitimate comparison: at rank 3 the Holm multiplier is (3 - 3) = 0, so
+    # the function would return an adjusted p-value of exactly 0.0. Supplying
+    # more p-values than the frozen denominator is a pre-registration
+    # violation (v3.0 §8), and apply_holm now refuses it rather than returning
+    # a silently wrong family.
     from scripts.wp1.nested_test import apply_holm  # noqa: PLC0415
 
-    adjusted_3 = apply_holm(pvalues, family_size=3)
-    assert adjusted_3[smallest_idx] != adjusted[smallest_idx], (
-        "apply_holm_b with family_size=4 should differ from family_size=3 on the smallest p"
-    )
+    with pytest.raises(ValueError, match="frozen"):
+        apply_holm(pvalues, family_size=3)
+
+    # The frozen denominator is still observably 4 rather than 3: the smallest
+    # p-value is multiplied by 4, not 3.
+    assert abs(adjusted[smallest_idx] - 0.01 * 4) < 1e-10
+    assert abs(adjusted[smallest_idx] - 0.01 * 3) > 1e-10
 
     # All adjusted p-values must be in [0, 1]
     for p_adj in adjusted:

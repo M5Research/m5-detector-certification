@@ -9,7 +9,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
-OUT_DIR = Path("docs/research/gauge-calibrated-detector-exclusion/figures")
+# Was a docs/research/... path from the private development repository, and it
+# was relative to the current working directory rather than the repository root.
+OUT_DIR = Path(__file__).resolve().parents[2] / "paper" / "figures"
 
 BLUE = "#2F5D8C"
 GREEN = "#3F7F5F"

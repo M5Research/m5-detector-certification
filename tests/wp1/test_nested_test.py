@@ -6,7 +6,9 @@ Covers:
   SC1a  — test_degeneracy_guard         : rank-deficient design matrix
   SC1b  — test_degeneracy_cond          : ill-conditioned (cond > 1e10) matrix
   SC1c  — test_fallback_engages         : joint chi2(2) fallback on degeneracy + n>=100
-  SC2   — test_d02_known_effect         : D-02 known-effect recovery (full pipeline)
+  SC2   — test_wald_recovers_an_injected_coefficient : HAC-Wald recovers a
+          coefficient injected into the DV (regression stage only, not
+          end-to-end; see the test's own docstring)
   SC3   — test_d02_null_calibration     : D-02 null calibration (no spurious reject)
   SC4   — test_d02_guard_fallback       : D-02 degeneracy guard + fallback
   SC5   — test_d02_under_powered        : D-02 under-powered flag fires
@@ -224,12 +226,24 @@ def _make_known_effect(rng: np.random.Generator, N: int = 600, W: int = 120, q: 
     return close, regime, y
 
 
-def test_d02_known_effect() -> None:
-    """SC2: D-02 known-effect recovery.
+def test_wald_recovers_an_injected_coefficient() -> None:
+    """SC2: the HAC-Wald stage recovers a coefficient injected into the DV.
 
-    Full-pipeline: run compute_rolling_predictability on synthetic close, then
-    apply nested-test functions. Assert the frozen conjunction:
-      delta_r2 >= 0.005 AND abs(beta_T) >= 0.01 AND wald_pvalue < 0.05.
+    NOT an end-to-end sensitivity test, despite the previous name
+    (`test_d02_known_effect`) and the "full-pipeline" wording. The effect is
+    added directly to the already-sampled dependent variable
+    (`y_nl = pred_nl + true_beta_T * T_nl`), not to the prices, so nothing
+    upstream of the regression is exercised: not the injection, not the rolling
+    predictability computation, not the regime labelling.
+
+    What it does validate is real and worth keeping — that the design matrix,
+    the Newey-West lag rule and the Wald restriction together recover a known
+    beta_T and clear the frozen conjunction (delta_r2 >= 0.005,
+    abs(beta_T) >= 0.01, wald p < 0.05). The name now says that.
+
+    True end-to-end sensitivity is covered by the injection cascade tests,
+    which inject into returns and run the full cascade (see
+    tests/wp1/test_injection_cascade.py, marked slow).
 
     Uses N=1200 (>= 3*W=360) for sufficient warmup bars.
     """
