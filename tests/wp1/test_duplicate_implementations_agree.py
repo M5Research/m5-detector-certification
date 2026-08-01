@@ -26,7 +26,9 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-pytestmark = pytest.mark.artifact
+# Deliberately NOT marked `artifact` at module level: these compare code paths
+# against each other. The one test that reads a committed artifact carries the
+# marker itself.
 
 
 # ---------------------------------------------------------------------------
@@ -84,6 +86,7 @@ def test_holm_is_monotone_and_bounded() -> None:
         )
 
 
+@pytest.mark.artifact
 def test_gauge_holm_matches_the_published_transport_family() -> None:
     """The 12-row transport family reproduces from its own raw p-values."""
     import json

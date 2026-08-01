@@ -25,7 +25,9 @@ from scripts.wp1.reference_repair import (
     verify_frozen,
 )
 
-pytestmark = pytest.mark.artifact
+# Marked per-test: the three tests below read the frozen repair artifact; the
+# rest exercise the repair procedure on synthetic draws and say nothing about
+# committed JSON.
 
 
 @pytest.fixture(scope="module")
@@ -38,10 +40,12 @@ def artifact() -> dict:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.artifact
 def test_frozen_artifact_passes_every_internal_check(artifact: dict) -> None:
     assert verify_frozen(artifact) == []
 
 
+@pytest.mark.artifact
 def test_frozen_artifact_matches_the_manuscript(artifact: dict) -> None:
     """The values the manuscript quotes for the primary window."""
     q2 = artifact["cells"]["W120_q2"]
@@ -56,6 +60,7 @@ def test_frozen_artifact_matches_the_manuscript(artifact: dict) -> None:
     assert q5["oos_size"] == 0.07
 
 
+@pytest.mark.artifact
 def test_out_of_sample_size_is_controlled_only_at_the_primary_window(
     artifact: dict,
 ) -> None:

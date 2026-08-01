@@ -25,7 +25,9 @@ import numpy as np
 import polars as pl
 import pytest
 
-pytestmark = pytest.mark.artifact
+# Deliberately NOT marked `artifact`: this module pins a polars behaviour that
+# the frozen warmup length depends on, but it reads no committed artifact.
+# `pytest -m artifact` must keep meaning "validates the frozen artifacts".
 
 
 def test_fill_nan_none_makes_nan_a_null() -> None:
