@@ -1,0 +1,30 @@
+# Line endings are part of this repository's evidence, not a local preference.
+#
+# The SHA-256 digests published in paper/ARTIFACT_LEDGER.md are computed over
+# the file bytes as committed, with LF line endings. Without this file, a
+# checkout on Windows (core.autocrlf=true) rewrites every text artifact to
+# CRLF and every published digest fails to verify. Pinning eol=lf makes a
+# fresh clone byte-identical on every platform.
+
+* text=auto eol=lf
+
+*.json text eol=lf
+*.md   text eol=lf
+*.py   text eol=lf
+*.tex  text eol=lf
+*.bib  text eol=lf
+*.txt  text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.cfg  text eol=lf
+*.csv  text eol=lf
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.pdf  binary
+*.npz  binary
+*.parquet binary
+*.pyd  binary
+*.so   binary
