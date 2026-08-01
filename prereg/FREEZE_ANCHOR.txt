@@ -17,16 +17,37 @@ amendment_d07_unix=1780665748
 amendment_d07_utc=2026-06-05T13:22:28Z
 amendment_d07_subject=docs(07): D-07 operationalization amendment (no-peeking, pre-result; freeze 720c1d4 untouched)
 
-freeze_v4_commit=1dc5c8295d3b
+freeze_v4_commit=1dc5c8295d3b212a00d704045d732e1b01d0d05d
 freeze_v4_short=1dc5c82
 freeze_v4_unix=1781205673
 freeze_v4_utc=2026-06-11T19:21:13Z
 freeze_v4_subject=FREEZE: v4.0 pre-registration (09-PREREGISTRATION.md)
 
-# Cited runs (UTC), each recorded in its own artifact under backtest_results/
+# Cited runs (UTC), each recorded in its own artifact under backtest_results/.
+# The cited freeze is the commit named in that artifact's provenance block.
 run_precheck_a=2026-06-05T13:40:54Z
+run_precheck_a_artifact=backtest_results/precheck/precheck_a_20260605_134054.json
+run_precheck_a_cites=dd44e7a16e79702a232bec30fa90428b158c7c3e
+
 run_precheck_b=2026-06-05T21:29:24Z
+run_precheck_b_artifact=backtest_results/precheck/precheck_b_20260605_212924.json
+run_precheck_b_cites=dd44e7a16e79702a232bec30fa90428b158c7c3e
+
 run_holdout_confirmatory=2026-06-23T17:53:08Z
+run_holdout_confirmatory_artifact=backtest_results/holdout/holdout_confirmatory_20260623_175305.json
+run_holdout_confirmatory_cites=dd44e7a16e79702a232bec30fa90428b158c7c3e
+
+run_eth_replication=2026-06-25T22:45:06Z
+run_eth_replication_artifact=backtest_results/asset_replication/eth_replication_20260625_224506.json
+run_eth_replication_cites=dd44e7a16e79702a232bec30fa90428b158c7c3e
+
+# The 96-cell injection power grid under data/injection_runs/ cites freeze
+# 1dc5c82 and carries no run timestamp; its ordering evidence is the code
+# commit that produced it. See VERIFICATION.md, "Ordering evidence by
+# artifact class".
+grid_prereg_commit=1dc5c8295d3b212a00d704045d732e1b01d0d05d
+grid_code_commit=9daf99338a21b0949f9080bb7be01082e2b03dae
+grid_code_commit_utc=2026-06-22T11:37:02Z
 
 repository_dev=https://github.com/M5Research/VolRegime-Engine
 repository_public=https://github.com/M5Research/m5-detector-certification
