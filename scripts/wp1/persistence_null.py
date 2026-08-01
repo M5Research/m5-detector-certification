@@ -115,22 +115,58 @@ def _bootstrap_ks_null(
     seed: int,
     S0: np.ndarray,
     W: int = W_PERSIST,
+    null: str = "sign_flip",
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Circular block-bootstrap KS null; single loop for KS, θ, and S(t) CI."""
+    """KS reference distribution under H0, plus theta and S(t) intervals.
+
+    `null` selects how the reference paths are generated.
+
+    ``"sign_flip"`` (default, and the only correct choice for this test)
+        r*_t = s_t * r_t with s_t iid Rademacher. This preserves |r_t|, and
+        therefore the volatility clustering and the marginal magnitude
+        distribution, while destroying all dependence in the sign. That is
+        exactly the martingale-difference hypothesis the arcsine law
+        describes, so KS_boot is drawn from the null distribution of the
+        statistic.
+
+    ``"block_observed"`` (legacy, retained only to reproduce the published
+    artifact)
+        Circular block resampling of the OBSERVED returns. This does not
+        impose H0: it preserves the observed dependence structure inside each
+        block, so KS_boot is the distribution of the statistic under the
+        observed process, not under the martingale. A p-value computed against
+        it answers "is the observed KS distance larger than block-resampling
+        of itself reproduces", which is a statement about structure at scales
+        beyond `block_size`, not about the martingale hypothesis.
+
+    The published `persistence_report_20260612_214557.json` used
+    ``"block_observed"`` and reported p = 0.0. Note the direction: the legacy
+    reference is not toothless, it is miscalibrated, and the miscalibration
+    happens to run toward rejection here because block resampling at L=120
+    destroys structure beyond that scale and so understates KS_boot. See
+    prereg/DEVIATIONS.md.
+    """
     r = np.asarray(log_returns, dtype=np.float64)
     n = r.size
     t_grid = np.arange(1, max_horizon + 1)
     rng = np.random.default_rng(seed)
     n_blocks = int(np.ceil(n / block_size))
 
+    if null not in ("sign_flip", "block_observed"):
+        raise ValueError(f"unknown null generator: {null!r}")
+
     ks_boots = np.empty(n_bootstrap, dtype=np.float64)
     theta_boots = np.empty(n_bootstrap, dtype=np.float64)
     S_boot_all = np.empty((n_bootstrap, max_horizon), dtype=np.float64)
 
     for b in range(n_bootstrap):
-        starts = rng.integers(0, n, size=n_blocks)
-        idx = (starts[:, None] + np.arange(block_size)[None, :]) % n
-        r_boot = r[idx.ravel()[:n]]
+        if null == "sign_flip":
+            signs = rng.choice(np.array([-1.0, 1.0]), size=n)
+            r_boot = r * signs
+        else:
+            starts = rng.integers(0, n, size=n_blocks)
+            idx = (starts[:, None] + np.arange(block_size)[None, :]) % n
+            r_boot = r[idx.ravel()[:n]]
         close_boot = np.concatenate([[1.0], np.exp(np.cumsum(r_boot))])
 
         T_boot = _compute_first_passage_times(close_boot, W=W, max_horizon=max_horizon)
@@ -149,8 +185,15 @@ def persistence_probability(
     block_size: int = BLOCK_SIZE,
     n_bootstrap: int = N_BOOTSTRAP,
     seed: int = PINNED_SEED,
+    null: str = "sign_flip",
 ) -> dict:
-    """Estimate S(t), fit θ, run block-bootstrap KS test against arcsin null."""
+    """Estimate S(t), fit theta, and test it against the arcsine law.
+
+    The reference distribution is generated under H0 by sign-flipping the
+    observed returns; see `_bootstrap_ks_null` for why block-resampling the
+    observed returns (``null="block_observed"``, the published artifact's
+    behaviour) does not impose the martingale hypothesis.
+    """
     close_arr = np.asarray(close, dtype=np.float64)
     if close_arr.ndim != 1:
         raise ValueError("close must be 1-D")
@@ -173,9 +216,14 @@ def persistence_probability(
         seed=seed,
         S0=S0,
         W=W_PERSIST,
+        null=null,
     )
 
-    p_value = float(np.mean(ks_boots >= ks_stat))
+    # (1 + #{KS_boot >= KS_obs}) / (1 + B): the Monte Carlo p-value cannot be
+    # exactly zero, since the observed statistic is itself one draw from the
+    # reference distribution under H0. The published artifact reports 0.0,
+    # which the uncorrected form np.mean(...) allows.
+    p_value = float((1 + np.sum(ks_boots >= ks_stat)) / (1 + ks_boots.size))
     theta_ci = [
         float(np.percentile(theta_boots, 2.5)),
         float(np.percentile(theta_boots, 97.5)),
@@ -201,6 +249,8 @@ def persistence_probability(
         "block_size": block_size,
         "n_bootstrap": n_bootstrap,
         "seed": seed,
+        "null_generator": null,
+        "p_value_convention": "(1 + #{KS_boot >= KS_obs}) / (1 + B)",
         "verdict": verdict,
         "bootstrap_ci_lo": bootstrap_ci_lo.tolist(),
         "bootstrap_ci_hi": bootstrap_ci_hi.tolist(),

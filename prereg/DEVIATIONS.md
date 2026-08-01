@@ -6,8 +6,8 @@ choice to the freeze that the freeze does not actually fix.
 
 It exists because the difference between a declared deviation and one a
 reviewer finds unaided is the difference between a rigorous study and a
-suspicious one. Each item below is individually defensible. None of them would
-be, discovered without warning.
+suspicious one. Every item below is individually defensible; none of them
+would be if a reader met it without warning.
 
 Read alongside `PREREGISTRATION-v3.0-freeze-720c1d4.md`,
 `PREREGISTRATION-v4.0-freeze-1dc5c82.md` and `VERIFICATION.md`.
@@ -28,6 +28,7 @@ published claim is, and how it is resolved.
 | [D9](#d9-addendum-scope-8-of-48-cells) | Addendum scope | no |
 | [D10](#d10-binomial-interval-method) | Binomial interval method | **yes** |
 | [D11](#d11-gate-guard-inactive-during-the-grid-run) | Gate guard | no |
+| [D12](#d12-persistence-null-did-not-simulate-the-null) | Persistence null | **yes** |
 
 ---
 
@@ -304,6 +305,58 @@ hand-edited provenance block.
 **Impact.** For this grid, freeze-before-run ordering rests on the run log and
 commit dates rather than on a runtime assertion captured at the moment of the
 run. The provenance blocks were written after the fact.
+
+---
+
+## D12 — Persistence null did not simulate the null
+
+**Claimed.** The persistence diagnostic reports a bootstrap p-value for the
+observed first-passage survival curve against the arcsine law, i.e. against the
+martingale-difference hypothesis.
+
+**Executed.** `_bootstrap_ks_null` generated its reference distribution by
+circular block-resampling **the observed returns**. That preserves the observed
+dependence structure within each block rather than imposing H0, so `KS_boot` is
+the distribution of the statistic under the observed process, not under the
+martingale.
+
+**Impact, measured.** Run on the same simulated data, the two generators
+behave completely differently:
+
+| Reference | AR(1) φ=0.4 (H0 false) | GARCH, no sign dependence (H0 true) |
+|---|---|---|
+| sign-flip (correct) | mean p = 0.024, rejects 5/6 | 0/6 false rejections |
+| block-observed (legacy) | mean p = 0.442, rejects **0/6** | 0/6 false rejections |
+
+The legacy reference has essentially **no power** against the alternative the
+arcsine law is a hypothesis about. Under a plain random walk the two agree,
+because an iid series already satisfies H0, which is why the existing unit
+tests never caught it.
+
+The published artifact nonetheless reports `bootstrap_p_value = 0.0` and
+`persistence_deviation_detected`. Both facts hold at once: the legacy test
+cannot detect sign dependence, yet it rejected on real BTC data. The rejection
+must therefore come from structure that block resampling at `L = 120` destroys
+— i.e. behaviour at scales beyond the block length — and not from the
+hypothesis under test. The published p-value does not mean what its name says.
+
+**Scope.** The persistence diagnostic is secondary. It supports no gate in the
+certificate and no headline claim; it appears as a diagnostic and in the ETH
+appendix.
+
+**Resolution.** The default null is now `sign_flip`
+(`r*_t = s_t · r_t`, `s_t` iid Rademacher), which preserves `|r_t|` and hence
+volatility clustering while destroying sign dependence — exactly the
+martingale-difference hypothesis. The p-value now uses the `(1+k)/(1+B)`
+convention, so it can no longer be exactly zero. The legacy generator remains
+reachable as `null="block_observed"` so the published artifact stays
+reproducible. Calibration and power tests are added, including one that
+demonstrates the two side by side.
+
+**Open.** `persistence_report_20260612_214557.json` was produced under the
+legacy null and has **not** been regenerated: that needs the BTC parquet data,
+which is not redistributable in this package. Its `bootstrap_p_value` should
+be read as the legacy quantity until it is rerun.
 
 ---
 
