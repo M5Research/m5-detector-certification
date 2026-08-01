@@ -1,3 +1,7 @@
+# Mirror of [project.dependencies] in pyproject.toml. Prefer:
+#   pip install -e ".[dev]"
+# which installs from the package metadata rather than from this file.
+
 # Core numerics — required to reproduce the paper's values from frozen artifacts.
 numpy>=1.26
 scipy>=1.13
@@ -11,10 +15,17 @@ statsmodels>=0.14
 # offline artifact-only reproduction).
 pyarrow>=14.0
 
-# Optional: faster bootstraps / the GARCH filter-sensitivity check.
-# The scripts fall back to pure-Python / SciPy paths if these are absent.
-# arch>=8.0
-# numba>=0.58
+# Hard module-level imports in src/strategies/vol_regime_switch/ and
+# scripts/wp1/gauge_bars.py. These are NOT optional: importing the certified
+# detectors fails without them. The polars pin is load-bearing for the D-01
+# warmup length (see rolling_quantile_detector.py).
+polars>=1.41,<2
+numba>=0.58
+pandas>=2.2
 
 # To run the verification suite.
 pytest>=8.2
+
+# Optional extras, not required for the offline artifact reproduction:
+#   arch>=8.0                  GARCH filter-sensitivity check (SciPy fallback exists)
+#   aiohttp>=3.9, requests     re-downloading raw market data
