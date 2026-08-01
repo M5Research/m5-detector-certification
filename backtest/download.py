@@ -39,6 +39,17 @@ def _read_partition(path) -> pd.DataFrame:
     return df[OHLCV_COLUMNS]
 
 
+class FetchFailed(RuntimeError):
+    """Every retry for a range failed.
+
+    Distinct from an empty result. The venue returning no rows for a range and
+    the network failing five times in a row are different facts, and a
+    downloader that feeds a certification dataset must not conflate them:
+    treating a transient failure as "no data here" silently punches a hole in
+    the series and the gap is invisible downstream.
+    """
+
+
 def _write_partition(path, df: pd.DataFrame) -> None:
     clean = df[OHLCV_COLUMNS].copy()
     for col in ("open", "high", "low", "close", "volume"):
@@ -87,7 +98,9 @@ async def fetch_klines_batch(
             except Exception as exc:
                 logger.error("Fetch %s at %s: %s", symbol, start_ms, exc)
                 await asyncio.sleep(2**attempt)
-    return []
+    raise FetchFailed(
+        f"{symbol}: all 5 attempts failed for the range starting {start_ms}"
+    )
 
 
 async def download_symbol_range(
@@ -107,11 +120,22 @@ async def download_symbol_range(
         datetime.fromtimestamp(end_ms / 1000, tz=UTC),
     )
 
+    skipped_ranges: list[tuple[int, int]] = []
+
     while current_ts < end_ms:
         batch = await fetch_klines_batch(session, symbol, current_ts, end_ms, semaphore)
         if not batch:
-            logger.warning("Empty batch %s at %s; advance 12h.", symbol, current_ts)
-            current_ts += 12 * 60 * MS_PER_MIN
+            # A genuinely empty range: the venue reported no rows. Advancing is
+            # correct, but the skip is recorded so the gap is auditable rather
+            # than living only in a log line. A retry exhaustion raises
+            # FetchFailed instead of arriving here.
+            skip_to = current_ts + 12 * 60 * MS_PER_MIN
+            logger.warning(
+                "Empty batch %s at %s; advancing 12h to %s.",
+                symbol, current_ts, skip_to,
+            )
+            skipped_ranges.append((current_ts, skip_to))
+            current_ts = skip_to
             await asyncio.sleep(RATE_LIMIT_DELAY)
             continue
 
@@ -123,6 +147,16 @@ async def download_symbol_range(
         current_ts = next_ts
         await asyncio.sleep(RATE_LIMIT_DELAY)
 
+    if skipped_ranges:
+        logger.warning(
+            "%s: %d range(s) returned no data and were skipped; total skipped "
+            "span %.1f hours. Ranges (ms): %s",
+            symbol,
+            len(skipped_ranges),
+            sum(b - a for a, b in skipped_ranges) / (1000 * 3600),
+            skipped_ranges,
+        )
+
     if not all_raw:
         return pd.DataFrame()
 
@@ -131,6 +165,7 @@ async def download_symbol_range(
     df["timestamp"] = df["timestamp"].astype(np.int64)
     for col in ("open", "high", "low", "close", "volume"):
         df[col] = df[col].astype(np.float64)
+    df.attrs["skipped_ranges_ms"] = skipped_ranges
     return df
 
 

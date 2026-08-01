@@ -47,6 +47,20 @@ different and weaker kind. This is stated rather than smoothed over:
 | Pre-Check A/B, holdout, ETH replication | `dd44e7a` | `provenance.run_ts` / `run_utc`, full precision, inside the artifact |
 | 96-cell injection power grid (`data/injection_runs/`) | `1dc5c82` | no run timestamp; `provenance.code_commit` `9daf993` (2026-06-22 11:37:02 UTC), + 10d 16h 15m 49s after the freeze |
 | Gauge, persistence, thermodynamic reports | `1dc5c82` | no run timestamp; date encoded in filename only |
+| Harmonized benchmark, online replay, VR detector MI | *(none named)* | no `prereg_commit` at all; `provenance.code_commit` `97416f4` / `77816ff` (2026-06-25), + 13d after the v4.0 freeze |
+| `mi_bootstrap_sensitivity.json` | *(none named)* | no `prereg_commit`, no `code_commit`; only `provenance.timestamp` 2026-06-23 |
+| `recentered_reference_repair_20260710.json` | *(none named)* | no commit or timestamp field; date in filename only. Declared exploratory post-freeze in its own provenance block |
+
+Seven artifacts name no `prereg_commit` at all. They are listed above rather
+than left for a reader to find by grepping. Four of them do record a
+`code_commit`, and every such commit post-dates the v4.0 freeze, so the
+ordering still holds — by the weaker code-date route. Two record only a
+timestamp or a filename date. None of them backs a freeze-ordering claim in
+the manuscript; the repair artifact is explicitly exploratory and
+post-freeze, which is how the manuscript reports it.
+
+`tests/wp1/test_frozen_artifacts.py` pins this set exactly, so a new artifact
+cannot quietly join the no-`prereg_commit` class.
 
 For the power grid the ordering claim therefore rests on the commit date of
 the code that produced it, not on a recorded run time. That is sufficient to

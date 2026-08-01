@@ -27,6 +27,22 @@ Causality: every signal at bar t uses only data <= t; the forward target is t ->
 are inner-joined on the shared 1m timestamp grid before any computation.
 
 Run:  python -m scripts.wp1.relative_value_ic
+
+D-07 SCOPE DECLARATION. This study's year range includes 2026, which the
+confirmatory apparatus deliberately excludes: every artifact backing a
+certificate records ``year_2026_loaded: false``, and the holdout is a frozen
+disposition example rather than discovery data.
+
+That is not a contradiction, and it is stated here so a reader does not have to
+work it out. This module is exploratory, it asks a different question from the
+cascade (signal information coefficients, not variance-ratio serial
+dependence), it was run after the holdout was opened, and no result it produces
+feeds any confirmatory claim, gate, certificate, or number in the manuscript.
+Its outputs are not cited in paper/ and are not listed in the artifact ledger.
+
+If any output of this module is ever promoted toward a confirmatory claim, the
+2026 rows must be dropped first and the claim re-derived on the pre-2026
+sample.
 """
 from __future__ import annotations
 

@@ -300,3 +300,60 @@ def test_artifact_marker_is_not_empty(pytestconfig: pytest.Config) -> None:
     still passes.
     """
     assert pytestmark.name == "artifact"
+
+
+# --------------------------------------------------------------------------
+# Artifacts that name no preregistration commit
+# --------------------------------------------------------------------------
+
+
+NO_PREREG_COMMIT = {
+    "harmonized_benchmark_q4_2022_btc.json",
+    "harmonized_benchmark_q4_2022_btc_minimal_hmm.json",
+    "harmonized_benchmark_smoke.json",
+    "online_gcde_replay.json",
+    "recentered_reference_repair_20260710.json",
+    "mi_bootstrap_sensitivity.json",
+    "vr_detector_mi.json",
+}
+
+
+def test_the_set_of_artifacts_without_a_prereg_commit_is_pinned() -> None:
+    """Seven artifacts name no prereg_commit; VERIFICATION.md lists all seven.
+
+    Their ordering rests on a code-commit date, a bare timestamp, or a filename
+    date rather than on a named freeze, which is weaker evidence and is
+    disclosed as such. Pinning the set means a new artifact cannot quietly join
+    the weak-evidence class without this test failing and the disclosure being
+    updated.
+    """
+    found = set()
+    for path in sorted(RESULTS_DIR.glob("**/*.json")):
+        prov = json.loads(path.read_text(encoding="utf-8")).get("provenance", {})
+        if prov and "prereg_commit" not in prov:
+            found.add(path.name)
+
+    assert found == NO_PREREG_COMMIT, (
+        "the set of artifacts lacking prereg_commit changed.\n"
+        f"  unexpected: {sorted(found - NO_PREREG_COMMIT)}\n"
+        f"  no longer present: {sorted(NO_PREREG_COMMIT - found)}\n"
+        "Update prereg/VERIFICATION.md's ordering-evidence table to match."
+    )
+
+
+def test_code_commits_of_unanchored_artifacts_are_recorded() -> None:
+    """Where these artifacts do carry a code_commit, it must be a full SHA.
+
+    The commit date is the only ordering evidence they have, so a truncated or
+    missing hash would make even that unverifiable.
+    """
+    for path in sorted(RESULTS_DIR.glob("**/*.json")):
+        prov = json.loads(path.read_text(encoding="utf-8")).get("provenance", {})
+        if not prov or "prereg_commit" in prov:
+            continue
+        code_commit = prov.get("code_commit")
+        if code_commit is not None:
+            assert len(code_commit) == 40, (
+                f"{path.name}: code_commit {code_commit!r} is not a full SHA, "
+                "and it is this artifact's only ordering evidence"
+            )
