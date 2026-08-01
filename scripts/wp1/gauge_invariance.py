@@ -178,7 +178,7 @@ def _median_se_for_q(pipeline: dict, q: int) -> tuple[float, int, float]:
 
     if n_nl > 0:
         return med, n_nl, float(1.0 / np.sqrt(n_nl))
-        return med, n_nl, float("inf")
+    return med, n_nl, float("inf")
 
 
 def _holm_adjust(pvalues: list[float]) -> list[float]:

@@ -976,6 +976,14 @@ def _fit_ms_variance_labels(close: np.ndarray, k_regimes: int = 3) -> tuple[np.n
     positive = finite[finite > 0.0]
     floor = float(np.min(positive)) if len(positive) else 1e-10
     endog = np.log(np.where(finite > 0.0, finite, floor))
+    # Global seeding is forbidden elsewhere in this project (v4.0 §3.5, §A.7)
+    # in favour of an explicit np.random.default_rng. This call site is the
+    # documented exception: MarkovRegression draws its EM restart
+    # initialisation from the global numpy RNG, and its random_seed= kwarg is
+    # non-functional in statsmodels 0.14.6 (see the D-07 note in
+    # src/strategies/vol_regime_switch/hmm_detector.py). Seeding a local
+    # Generator here would not reach the fit, and would silently make this
+    # benchmark non-deterministic rather than more rigorous.
     np.random.seed(42)
     model = MarkovRegression(
         endog,

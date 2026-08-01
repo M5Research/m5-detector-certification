@@ -511,6 +511,16 @@ def apply_holm(
     3. Enforce step-down monotonicity: adjusted[i] >= adjusted[i-1] in sorted order.
     4. Return in original input order.
     """
+    if len(pvalues) > family_size:
+        raise ValueError(
+            f"Holm family size is frozen at {family_size} but {len(pvalues)} "
+            "p-values were supplied. Enlarging a frozen multiplicity "
+            "denominator after the freeze is a pre-registration violation "
+            "(v3.0 §8), and with more p-values than the denominator the "
+            "multiplier (family_size - rank) reaches zero and silently "
+            "returns adjusted p-values of 0."
+        )
+
     k = family_size
     order = sorted(range(len(pvalues)), key=lambda i: pvalues[i])
     adjusted = [0.0] * len(pvalues)

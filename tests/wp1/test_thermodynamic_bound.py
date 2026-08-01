@@ -1,5 +1,6 @@
 import json
 import shutil
+import tempfile
 from pathlib import Path
 
 import matplotlib
@@ -102,23 +103,39 @@ def _write_mock_injection(tmp_path: Path) -> Path:
     return tmp_path
 
 
-def test_exclusion_gap_with_mock_injection():
-    close = _random_walk_close(N_CLOSE)
-    inj_dir = PROJECT_ROOT / "data" / "_test_injection_thermo"
-    if inj_dir.exists():
-        shutil.rmtree(inj_dir)
-    inj_dir.mkdir(parents=True)
+@pytest.fixture
+def in_repo_tmp_dir():
+    """A scratch directory *inside* PROJECT_ROOT, always cleaned up.
+
+    pytest's tmp_path cannot be used here: `_resolve_injection_dir` rejects any
+    path that does not resolve under PROJECT_ROOT, which is a deliberate
+    path-traversal guard in production code, not an oversight. So the scratch
+    directory has to live in the tree.
+
+    The previous version hardcoded data/_test_injection_thermo and opened with
+    an unconditional rmtree, which raced against itself under pytest-xdist and
+    left the working tree dirty whenever the test failed before its teardown.
+    mkdtemp gives each worker a unique name and the finally block runs on
+    failure too.
+    """
+    scratch_root = PROJECT_ROOT / "data"
+    scratch_root.mkdir(parents=True, exist_ok=True)
+    path = Path(tempfile.mkdtemp(prefix="_test_injection_thermo_", dir=scratch_root))
     try:
-        _write_mock_injection(inj_dir)
-        report = compute_thermodynamic_bound(
-            close, Q_GRID, _cost_schedule(), injection_dir=inj_dir, n_boot=N_BOOT_TEST
-        )
-        assert report["delta_star_info"]["status"] == "ok"
-        assert report["exclusion_gap_summary"]["headline_gap_bps"] is not None
-        assert any(row["exclusion_gap_bps"] is not None for row in report["per_q_results"])
+        yield path
     finally:
-        if inj_dir.exists():
-            shutil.rmtree(inj_dir)
+        shutil.rmtree(path, ignore_errors=True)
+
+
+def test_exclusion_gap_with_mock_injection(in_repo_tmp_dir):
+    close = _random_walk_close(N_CLOSE)
+    inj_dir = _write_mock_injection(in_repo_tmp_dir)
+    report = compute_thermodynamic_bound(
+        close, Q_GRID, _cost_schedule(), injection_dir=inj_dir, n_boot=N_BOOT_TEST
+    )
+    assert report["delta_star_info"]["status"] == "ok"
+    assert report["exclusion_gap_summary"]["headline_gap_bps"] is not None
+    assert any(row["exclusion_gap_bps"] is not None for row in report["per_q_results"])
 
 
 def test_chain_consistent_across_q():

@@ -16,7 +16,10 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote
 
-import requests
+# `requests` is imported inside download_month() rather than here. Everything
+# else in this module — URL construction, hidden-form payload extraction, tick
+# row parsing — is offline string handling, and its tests should not need a
+# network library installed. `requests` is an optional 'download' extra.
 
 DEFAULT_SYMBOL = "EURUSD"
 DEFAULT_OUT_DIR = Path("data/external/histdata/EURUSD/tick")
@@ -172,6 +175,14 @@ def download_month(
     aggregate: str = "tick",
 ) -> list[dict[str, float | str | int]]:
     """Download and parse one HistData Generic ASCII tick month."""
+    try:
+        import requests
+    except ModuleNotFoundError as exc:  # pragma: no cover - install-path guard
+        raise ModuleNotFoundError(
+            "download_month() needs the optional 'download' extra: "
+            'pip install -e ".[download]"'
+        ) from exc
+
     url = histdata_download_page_url(symbol, year, month)
     with requests.Session() as session:
         page = session.get(url, timeout=timeout)
