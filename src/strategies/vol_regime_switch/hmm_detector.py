@@ -33,9 +33,11 @@ Key implementation notes:
     RV before log transform (D-03); floor value recorded in §14.5 amendment.
   - 10 restarts via separate fit() calls (search_reps=0 each) to collect
     per-restart LLs for the §8b convergence trigger (RESEARCH.md PQ-5).
-  - §8b convergence trigger: the class exposes finite-only restart diagnostics
-    and `convergence_ok_`; the orchestration caller applies the frozen 2-state
-    fallback. This class does not change `k_regimes` during `fit()`.
+  - §8b convergence diagnostics: the class exposes finite-only restart metrics
+    and `convergence_ok_`, but never automatically refits to 2 states. Current
+    validation/regate callers may select a 2-state profile for timing/OOM policy
+    before or around fitting.
+    This policy does not react automatically to `convergence_ok_=False`.
 
 Phase boundary: pure computational unit. No gate, no predictability, no ε².
 This module does NOT import gate_analysis, predictability, or regate_analysis.
@@ -70,8 +72,9 @@ class HMMDetector:
     Inference: Hamilton forward-filter probabilities are causal given fixed
     parameters. This detector fits parameters, state ordering, and the log-RV
     floor on the full sample, so the complete detector is not real-time causal.
-    The class exposes the §8b convergence trigger; the orchestration caller
-    applies any frozen 2-state fallback.
+    The class exposes §8b convergence diagnostics only.
+    It never automatically refits to 2 states. Timing/OOM profile selection
+    remains caller-owned and is separate from `convergence_ok_`.
 
     Parameters
     ----------
@@ -115,7 +118,10 @@ class HMMDetector:
         self.trend = trend
         self.switching_trend = switching_trend
 
-        # Attributes set after fit()
+        self._reset_fit_state()
+
+    def _reset_fit_state(self) -> None:
+        """Clear all learned and failure-sensitive state before a fit attempt."""
         self.rv_: np.ndarray = np.array([], dtype=np.float64)
         self.log_rv_: np.ndarray = np.array([], dtype=np.float64)
         self.filtered_probs_: np.ndarray = np.array([], dtype=np.float64)
@@ -137,6 +143,10 @@ class HMMDetector:
     def fit(self, close: np.ndarray) -> np.ndarray:
         """Compute anchored full-sample int8 regime labels.
 
+        This method exposes convergence diagnostics only.
+        It never automatically refits to 2 states.
+        Empty input returns an empty int8 array after clearing prior fit state.
+
         Parameters
         ----------
         close : array-like
@@ -151,13 +161,13 @@ class HMMDetector:
         Raises
         ------
         ValueError
-            On empty (length 0 returns [] not an error), NaN/Inf values,
-            non-positive prices, non-1-D input, or fewer than 2 finite log-RV
-            observations after warmup.
+            On NaN/Inf values, non-positive prices, non-1-D input, or fewer
+            than 2 finite log-RV observations after warmup.
         RuntimeError
             When every restart returns a non-finite log-likelihood, or when
             the result lacks the filtered_marginal_probabilities API.
         """
+        self._reset_fit_state()
         close = np.asarray(close, dtype=np.float64)
 
         if close.size == 0:
