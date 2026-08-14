@@ -1,7 +1,9 @@
 # Production-Grade JFDS Remediation Design
 
-**Date:** 2026-08-14  
-**Repositories:** `m5-detector-certification`, `VolRegime-Engine`  
+**Date:** 2026-08-14
+
+**Repositories:** `m5-detector-certification`, `VolRegime-Engine`
+
 **Paper title:** *Certifying Regime Detectors Before Use*
 
 ## Objective
