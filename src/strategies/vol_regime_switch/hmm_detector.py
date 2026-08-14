@@ -5,19 +5,18 @@ Implements the ROBUSTNESS detector specified in 01-PREREGISTRATION.md §7.2
 2026-06-02).
 
 CAUSALITY SCOPE — read before citing this detector as causal.
-  Inference is causal GIVEN THE PARAMETERS: labels come from
+  Filtering is causal GIVEN THE PARAMETERS: labels come from
   `filtered_marginal_probabilities` (the Hamilton forward filter) and never
-  from the Kim smoother. The parameters themselves are not causal. The EM fit
-  (means, switching variances, transition matrix), the ascending-variance state
-  ordering, and the log-domain floor are each estimated ONCE over the full
-  sample. A label at bar t therefore depends on data after t, through the
-  fitted parameters.
+  from the Kim smoother. The parameters themselves are not causal. The
+  full-sample fit (regime means, switching variances, and transition matrix),
+  the ascending-variance state ordering, and the log-domain floor are each
+  estimated ONCE over the full sample. A label at bar t therefore depends on
+  data after t through the fitted parameters, ordering, and floor.
 
-  This is the standard anchored full-sample Markov-switching convention and it
-  is an acceptable choice for a frozen measurement instrument, which is how the
-  manuscript uses it. It is NOT a real-time causal detector, and it must not be
-  used to evaluate out-of-sample predictability without refitting on an
-  expanding window with the state ordering fixed by the first window.
+  This anchored full-sample convention is suitable for the frozen measurement
+  instrument used by the manuscript. It is NOT a real-time causal detector and
+  must not be used to evaluate out-of-sample predictability unless parameters,
+  ordering, and the floor are fixed using only information available by bar t.
 
 Frozen primary parameters:
   rv_window=60, k_regimes=3, em_iter=100, search_reps=10, ewma=False,
@@ -59,14 +58,16 @@ PINNED_SEED: int = 42  # recorded in §14.5 amendment + 03-VALIDATION.md
 
 
 class HMMDetector:
-    """Causal HMM Markov-switching volatility-regime detector.
+    """Anchored full-sample HMM volatility-regime detector.
 
     Implements the frozen §7.2 robustness detector spec (01-PREREGISTRATION.md,
     commit 169fc20) with the §14.5 HMM amendment bundle (D-02/D-03/D-06,
     2026-06-02).
 
     Labels: -1 = warmup, 0 = LOW, 1 = ELEVATED, 2 = EXTREME
-    Causality: Hamilton forward filter (filtered_marginal_probabilities ONLY).
+    Inference: Hamilton forward-filter probabilities are causal given fixed
+    parameters. This detector fits parameters, state ordering, and the log-RV
+    floor on the full sample, so the complete detector is not real-time causal.
 
     Parameters
     ----------
@@ -128,7 +129,7 @@ class HMMDetector:
         self.spread_fraction_: float = float("nan")
 
     def fit(self, close: np.ndarray) -> np.ndarray:
-        """Compute causal int8 regime labels for the full close series.
+        """Compute anchored full-sample int8 regime labels.
 
         Parameters
         ----------
@@ -146,6 +147,9 @@ class HMMDetector:
         ValueError
             On empty (length 0 returns [] not an error), NaN/Inf values,
             non-positive prices, or non-1-D input.
+        RuntimeError
+            When every restart returns a non-finite log-likelihood, or when
+            the result lacks the filtered_marginal_probabilities API.
         """
         close = np.asarray(close, dtype=np.float64)
 
@@ -239,12 +243,18 @@ class HMMDetector:
                 except Exception:
                     conv_i = True  # retry also failed — mark as failed
 
-            ll_values.append(res_i.llf)
+            llf_i = float(res_i.llf)
+            ll_values.append(llf_i if np.isfinite(llf_i) else -float("inf"))
             conv_flags.append(conv_i)
             results_list.append(res_i)
 
         # Step 4: §8b convergence trigger — top-5 LL spread
         ll_arr = np.array(ll_values)
+        if not np.any(np.isfinite(ll_arr)):
+            raise RuntimeError(
+                "All HMM EM restarts returned a non-finite log-likelihood. "
+                "The input series may be too short, flat, or degenerate."
+            )
         sorted_ll = np.sort(ll_arr)[::-1]  # descending (may contain -inf for failed restarts)
         # Use top-5 if ≥5 restarts; otherwise use the full set (top-n spread)
         n_for_spread = min(5, len(sorted_ll))
@@ -257,17 +267,7 @@ class HMMDetector:
         any_persistent_conv = any(conv_flags)
         convergence_ok = (spread_frac < 0.01) and not any_persistent_conv
 
-        # Best restart = highest LL among successful (non-None) restarts.
-        # Restarts that raised are already recorded as -inf, but a restart that
-        # "succeeds" while returning a NaN log-likelihood is not: np.argmax
-        # returns the index of the first NaN it sees, which would select a
-        # degenerate fit as the best one. Demote NaN to -inf first.
-        ll_arr = np.where(np.isnan(ll_arr), -np.inf, ll_arr)
-        if not np.any(np.isfinite(ll_arr)):
-            raise RuntimeError(
-                "All HMM EM restarts returned a non-finite log-likelihood. "
-                "The input series may be too short, flat, or degenerate."
-            )
+        # Best restart = highest LL among successful (non-None) restarts
         best_idx = int(np.argmax(ll_arr))
         best_res = results_list[best_idx]
         if best_res is None:
@@ -282,15 +282,12 @@ class HMMDetector:
                     "The input series may be too short, flat, or degenerate."
                 )
 
-        # Step 5: runtime API check (§7.2 — required per statsmodels stability
-        # note). Not an assert: this guards against a third-party API change at
-        # runtime, and `python -O` strips asserts, which would turn a clear
-        # failure into an AttributeError further down.
+        # Step 5: runtime API guard (§7.2 — required per statsmodels stability note)
         if not hasattr(best_res, "filtered_marginal_probabilities"):
             raise RuntimeError(
-                "statsmodels API: filtered_marginal_probabilities not found on "
-                "the result object. statsmodels has flagged this module as "
-                "'not guaranteed stable' (§7.2)."
+                "statsmodels API: filtered_marginal_probabilities not found on result "
+                "object. statsmodels has flagged this module as 'not guaranteed stable' "
+                "(§7.2)."
             )
 
         # Step 6: variance-ascending relabeling (RESEARCH.md PQ-6 / D-08)
