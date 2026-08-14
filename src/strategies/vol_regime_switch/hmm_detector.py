@@ -33,7 +33,9 @@ Key implementation notes:
     RV before log transform (D-03); floor value recorded in §14.5 amendment.
   - 10 restarts via separate fit() calls (search_reps=0 each) to collect
     per-restart LLs for the §8b convergence trigger (RESEARCH.md PQ-5).
-  - §8b convergence trigger: top-5 LL spread ≥ 1% of |mean LL| → 2-state fallback.
+  - §8b convergence trigger: the class exposes finite-only restart diagnostics
+    and `convergence_ok_`; the orchestration caller applies the frozen 2-state
+    fallback. This class does not change `k_regimes` during `fit()`.
 
 Phase boundary: pure computational unit. No gate, no predictability, no ε².
 This module does NOT import gate_analysis, predictability, or regate_analysis.
@@ -68,6 +70,8 @@ class HMMDetector:
     Inference: Hamilton forward-filter probabilities are causal given fixed
     parameters. This detector fits parameters, state ordering, and the log-RV
     floor on the full sample, so the complete detector is not real-time causal.
+    The class exposes the §8b convergence trigger; the orchestration caller
+    applies any frozen 2-state fallback.
 
     Parameters
     ----------
@@ -120,6 +124,8 @@ class HMMDetector:
         self.convergence_ok_: bool = False
         self.hmm_fallback_: str = "none"
         self.floored_bar_count_: int = 0
+        self.successful_restart_count_: int = 0
+        self.failed_restart_count_: int = 0
         # Variance-separation diagnostics (D-10)
         self.sigma2_sorted_: np.ndarray = np.array([], dtype=np.float64)
         self.ratio_elev_low_: float = float("nan")
@@ -146,7 +152,8 @@ class HMMDetector:
         ------
         ValueError
             On empty (length 0 returns [] not an error), NaN/Inf values,
-            non-positive prices, or non-1-D input.
+            non-positive prices, non-1-D input, or fewer than 2 finite log-RV
+            observations after warmup.
         RuntimeError
             When every restart returns a non-finite log-likelihood, or when
             the result lacks the filtered_marginal_probabilities API.
@@ -183,6 +190,12 @@ class HMMDetector:
         floored_count = int(np.sum(rv_finite == 0))
         rv_floored = np.where(rv_finite > 0, rv_finite, floor_value)
         log_rv = np.log(rv_floored)
+        n_finite_log_rv = int(np.count_nonzero(np.isfinite(log_rv)))
+        if n_finite_log_rv < 2:
+            raise ValueError(
+                "HMMDetector requires at least 2 finite log-RV observations "
+                f"after warmup; got {n_finite_log_rv}."
+            )
 
         # Step 3: 10 restarts (search_reps=0 each) to collect per-restart LLs (§8b / PQ-5)
         # GC collect before the restart loop to free any fragmented memory (important for
@@ -244,28 +257,63 @@ class HMMDetector:
                     conv_i = True  # retry also failed — mark as failed
 
             llf_i = float(res_i.llf)
-            ll_values.append(llf_i if np.isfinite(llf_i) else -float("inf"))
-            conv_flags.append(conv_i)
-            results_list.append(res_i)
+            if np.isfinite(llf_i):
+                ll_values.append(llf_i)
+                conv_flags.append(conv_i)
+                results_list.append(res_i)
+            else:
+                logger.debug("Restart %d returned non-finite llf=%r", i, llf_i)
+                ll_values.append(-float("inf"))
+                conv_flags.append(True)
+                results_list.append(None)
 
         # Step 4: §8b convergence trigger — top-5 LL spread
-        ll_arr = np.array(ll_values)
-        if not np.any(np.isfinite(ll_arr)):
+        ll_arr = np.asarray(ll_values, dtype=np.float64)
+        finite_mask = np.isfinite(ll_arr)
+        successful_restart_count = int(np.count_nonzero(finite_mask))
+        failed_restart_count = int(len(ll_arr) - successful_restart_count)
+        self.successful_restart_count_ = successful_restart_count
+        self.failed_restart_count_ = failed_restart_count
+        if successful_restart_count == 0:
             raise RuntimeError(
                 "All HMM EM restarts returned a non-finite log-likelihood. "
                 "The input series may be too short, flat, or degenerate."
             )
-        sorted_ll = np.sort(ll_arr)[::-1]  # descending (may contain -inf for failed restarts)
-        # Use top-5 if ≥5 restarts; otherwise use the full set (top-n spread)
-        n_for_spread = min(5, len(sorted_ll))
+        finite_ll = ll_arr[finite_mask]
+        sorted_ll = np.sort(finite_ll)[::-1]
+        # Use the top 5 finite restarts, or every finite restart when fewer succeed.
+        n_for_spread = min(5, successful_restart_count)
         if n_for_spread < 2:
             top5_spread = 0.0
         else:
-            top5_spread = float(sorted_ll[0] - sorted_ll[n_for_spread - 1])
-        mean_ll_abs = float(abs(np.mean(ll_arr[np.isfinite(ll_arr)]))) if np.any(np.isfinite(ll_arr)) else float("inf")
-        spread_frac = top5_spread / mean_ll_abs if mean_ll_abs > 0 else float("inf")
+            with np.errstate(over="ignore", invalid="ignore"):
+                top5_spread = float(sorted_ll[0] - sorted_ll[n_for_spread - 1])
+            if not np.isfinite(top5_spread):
+                top5_spread = float(np.finfo(np.float64).max)
+
+        ll_scale = float(np.max(np.abs(finite_ll)))
+        if ll_scale == 0.0:
+            mean_ll_abs = 0.0
+        else:
+            mean_ll_abs = float(ll_scale * abs(np.mean(finite_ll / ll_scale)))
+        denominator_ok = mean_ll_abs > 0.0
+        if denominator_ok:
+            with np.errstate(over="ignore", invalid="ignore"):
+                spread_frac = float(top5_spread / mean_ll_abs)
+            if not np.isfinite(spread_frac):
+                spread_frac = float(np.finfo(np.float64).max)
+        else:
+            spread_frac = 0.0
+
+        required_success_count = min(5, self.search_reps)
+        enough_successes = successful_restart_count >= required_success_count
         any_persistent_conv = any(conv_flags)
-        convergence_ok = (spread_frac < 0.01) and not any_persistent_conv
+        convergence_ok = (
+            denominator_ok
+            and enough_successes
+            and spread_frac < 0.01
+            and not any_persistent_conv
+        )
 
         # Best restart = highest LL among successful (non-None) restarts
         best_idx = int(np.argmax(ll_arr))
@@ -332,6 +380,8 @@ class HMMDetector:
         self.convergence_ok_ = convergence_ok
         self.hmm_fallback_ = "none"
         self.floored_bar_count_ = floored_count
+        self.successful_restart_count_ = successful_restart_count
+        self.failed_restart_count_ = failed_restart_count
         self.sigma2_sorted_ = sorted_sigmas.copy()
         self.ratio_elev_low_ = ratio_elev_low
         self.ratio_ext_elev_ = ratio_ext_elev
