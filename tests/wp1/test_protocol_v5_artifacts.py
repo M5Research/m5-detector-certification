@@ -8,6 +8,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 BTC = ROOT / "evidence" / "gates" / "btcusdt-vr-q2-v5-r0" / "evidence.json"
+BTC_CERTIFICATE = ROOT / "certificates" / "btcusdt-vr-q2-v5-r0.json"
 
 
 @pytest.mark.artifact
@@ -31,3 +32,12 @@ def test_btc_successor_gate_values_are_self_consistent() -> None:
     assert gates["power"]["estimand"] == artifact["calibration"]["cmde_90"]
     assert gates["transport"]["state"] == artifact["transport"]["state"]
     assert gates["information"]["estimand"] == artifact["information"]["q2"]["e_value"]
+
+
+@pytest.mark.artifact
+def test_btc_successor_certificate_is_complete_and_mechanically_withheld() -> None:
+    record = json.loads(BTC_CERTIFICATE.read_text(encoding="utf-8"))
+
+    assert record["completeness"] is True
+    assert record["disposition"] == "target_mismatched"
+    assert {row["gate"] for row in record["gates"]} == set(record["spec"]["required_gates"])
