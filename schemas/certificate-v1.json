@@ -1,0 +1,326 @@
+{
+  "$defs": {
+    "CertificateSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "alpha": {
+          "exclusiveMinimum": 0,
+          "maximum": 0.05,
+          "title": "Alpha",
+          "type": "number"
+        },
+        "certificate_id": {
+          "minLength": 1,
+          "title": "Certificate Id",
+          "type": "string"
+        },
+        "claim_id": {
+          "minLength": 1,
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "costs": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Costs",
+          "type": "object"
+        },
+        "detector": {
+          "minLength": 1,
+          "title": "Detector",
+          "type": "string"
+        },
+        "evidence_revision": {
+          "minimum": 0,
+          "title": "Evidence Revision",
+          "type": "integer"
+        },
+        "horizon": {
+          "exclusiveMinimum": 0,
+          "title": "Horizon",
+          "type": "integer"
+        },
+        "instrument": {
+          "minLength": 1,
+          "title": "Instrument",
+          "type": "string"
+        },
+        "margins": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Margins",
+          "type": "object"
+        },
+        "null_family": {
+          "minLength": 1,
+          "title": "Null Family",
+          "type": "string"
+        },
+        "parent_certificate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Certificate Id"
+        },
+        "parent_spec_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Spec Hash"
+        },
+        "patch_kind": {
+          "default": "evidentiary",
+          "enum": [
+            "evidentiary",
+            "metadata"
+          ],
+          "title": "Patch Kind",
+          "type": "string"
+        },
+        "preregistration_commit": {
+          "minLength": 7,
+          "title": "Preregistration Commit",
+          "type": "string"
+        },
+        "protocol_id": {
+          "default": "protocol-v5",
+          "title": "Protocol Id",
+          "type": "string"
+        },
+        "required_gates": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Required Gates",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "certificate-v1",
+          "default": "certificate-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "schemes": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Schemes",
+          "type": "array"
+        },
+        "signal_family": {
+          "minLength": 1,
+          "title": "Signal Family",
+          "type": "string"
+        },
+        "target": {
+          "minLength": 1,
+          "title": "Target",
+          "type": "string"
+        },
+        "thresholds": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Thresholds",
+          "type": "object"
+        },
+        "venue": {
+          "minLength": 1,
+          "title": "Venue",
+          "type": "string"
+        }
+      },
+      "required": [
+        "certificate_id",
+        "claim_id",
+        "evidence_revision",
+        "detector",
+        "instrument",
+        "venue",
+        "target",
+        "schemes",
+        "horizon",
+        "signal_family",
+        "null_family",
+        "required_gates",
+        "preregistration_commit",
+        "alpha"
+      ],
+      "title": "CertificateSpec",
+      "type": "object"
+    },
+    "GateResult": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Artifacts",
+          "type": "array"
+        },
+        "estimand": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Estimand"
+        },
+        "gate": {
+          "minLength": 1,
+          "title": "Gate",
+          "type": "string"
+        },
+        "reason": {
+          "default": "",
+          "title": "Reason",
+          "type": "string"
+        },
+        "state": {
+          "title": "State",
+          "type": "string"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Threshold"
+        },
+        "uncertainty": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Uncertainty",
+          "type": "object"
+        }
+      },
+      "required": [
+        "gate",
+        "state"
+      ],
+      "title": "GateResult",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "code_hash": {
+      "minLength": 7,
+      "title": "Code Hash",
+      "type": "string"
+    },
+    "completeness": {
+      "title": "Completeness",
+      "type": "boolean"
+    },
+    "data_hashes": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "minProperties": 1,
+      "title": "Data Hashes",
+      "type": "object"
+    },
+    "disposition": {
+      "title": "Disposition",
+      "type": "string"
+    },
+    "failure_profile": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Failure Profile",
+      "type": "array"
+    },
+    "gates": {
+      "items": {
+        "$ref": "#/$defs/GateResult"
+      },
+      "title": "Gates",
+      "type": "array"
+    },
+    "provenance": {
+      "additionalProperties": true,
+      "title": "Provenance",
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "certificate-v1",
+      "default": "certificate-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "spec": {
+      "$ref": "#/$defs/CertificateSpec"
+    },
+    "spec_hash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "title": "Spec Hash",
+      "type": "string"
+    },
+    "superseded": {
+      "default": false,
+      "title": "Superseded",
+      "type": "boolean"
+    },
+    "supersession_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersession Status"
+    },
+    "upstream_hash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "title": "Upstream Hash",
+      "type": "string"
+    }
+  },
+  "required": [
+    "spec",
+    "spec_hash",
+    "code_hash",
+    "data_hashes",
+    "upstream_hash",
+    "gates",
+    "completeness",
+    "disposition"
+  ],
+  "title": "CertificateRecord",
+  "type": "object"
+}
