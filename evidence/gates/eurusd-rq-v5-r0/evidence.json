@@ -1,0 +1,448 @@
+{
+  "artifact": "eurusd_rolling_quantile_protocol_v5_evidence",
+  "calibration": {
+    "cmde_90": null,
+    "power": [
+      {
+        "bounds": {
+          "lower": 0.05458983750817441,
+          "upper": 0.07670637897458908
+        },
+        "draws": 2000,
+        "rate": 0.065,
+        "scale": 1.25,
+        "successes": 130
+      },
+      {
+        "bounds": {
+          "lower": 0.14850326710395717,
+          "upper": 0.18148671415786655
+        },
+        "draws": 2000,
+        "rate": 0.1645,
+        "scale": 1.5,
+        "successes": 329
+      },
+      {
+        "bounds": {
+          "lower": 0.3636061616631006,
+          "upper": 0.40673158521329283
+        },
+        "draws": 2000,
+        "rate": 0.385,
+        "scale": 2.0,
+        "successes": 770
+      },
+      {
+        "bounds": {
+          "lower": 0.6804013342342006,
+          "upper": 0.7210077826735917
+        },
+        "draws": 2000,
+        "rate": 0.701,
+        "scale": 3.0,
+        "successes": 1402
+      },
+      {
+        "bounds": {
+          "lower": 0.8738824262605689,
+          "upper": 0.9019672047699311
+        },
+        "draws": 2000,
+        "rate": 0.8885,
+        "scale": 4.0,
+        "successes": 1777
+      }
+    ],
+    "power_state": "fail",
+    "seed": 17237081714866203988,
+    "size": {
+      "bounds": {
+        "lower": 0.050996412095652935,
+        "upper": 0.06006469705857514
+      },
+      "draws": 10000,
+      "rate": 0.0554,
+      "state": "fail",
+      "successes": 554
+    },
+    "stationary_mean_block": 119
+  },
+  "clock_counts": {
+    "calendar": 1875343,
+    "intrinsic-variance": 493750,
+    "tick-count": 1045041
+  },
+  "created_at": "2026-08-15T09:41:10Z",
+  "data_hashes": {
+    "EURUSD_2026_01_m1_bidask.csv": "226d45841537225e2cae0fb1549a1b2793cc7294c21a25cdc52df223d9204bae",
+    "EURUSD_2026_02_m1_bidask.csv": "11098aec0f9f10d136984f82708e9eaa0f54528a4e15937baf2e961827746da5",
+    "EURUSD_2026_03_m1_bidask.csv": "7e999b697fab3ea49b565466b368315995ca28be96ec9664e59fa8a08693ba8c",
+    "EURUSD_2026_04_m1_bidask.csv": "15e1369d96ea50c3674dc7bca91b78244dc1c962ebe27ed2ad2ec34904f3757b",
+    "EURUSD_2026_05_m1_bidask.csv": "97832959309ab1ac19400d6e2ff4fbdd114be59bc82140f751080e36a8c76470",
+    "EURUSD_2026_06_m1_bidask.csv": "dd244fe968231bf8fa1824db135a7644ca6da26163845f9d34419ff5374d50aa",
+    "EURUSD_2026_07_m1_bidask.csv": "e269cc50b465a4888b604fdcbc4838d0c41035e743f96930af1afc85c478d00a",
+    "development_calibration": "34659ca15f2b93b78845055aaf64f4973ab0656a9e6170e3ac88fa24865826d6",
+    "evaluation_manifest": "9d91340e3814fbcc40fc2bb065a5f884f7353e1b7bf7ea6dee430d688e8f9050"
+  },
+  "data_quality": {
+    "combined": {
+      "duplicate_rows": 0,
+      "input_rows": 1875343,
+      "output_rows": 1875343
+    },
+    "development": {
+      "duplicate_rows": 240,
+      "input_rows": 1659616,
+      "output_rows": 1659376
+    },
+    "evaluation": {
+      "duplicate_rows": 4,
+      "input_rows": 215971,
+      "output_rows": 215967
+    },
+    "vendor_partitions": [
+      {
+        "ask_gte_bid_positive": true,
+        "duplicate_timestamps": 0,
+        "first_timestamp": "2026-01-01T22:04:00.000000Z",
+        "last_timestamp": "2026-01-30T21:59:00.000000Z",
+        "max_gap_minutes": 2882.0,
+        "monotonic_utc": true,
+        "path": "data/external/histdata/EURUSD/tick/EURUSD_2026_01_m1_bidask.csv",
+        "raw_bytes": 9656678,
+        "raw_path": "data/external/histdata/EURUSD/tick/raw/EURUSD_2026_01_tick.zip",
+        "raw_sha256": "45d65cc5f4282f472919111480fe6bcf8df3354eb199d08f267434d8ddec83d3",
+        "row_count": 30150,
+        "sha256": "226d45841537225e2cae0fb1549a1b2793cc7294c21a25cdc52df223d9204bae",
+        "source_url": "https://www.histdata.com/download-free-forex-data/?/ascii/tick-data-quotes/EURUSD/2026/01",
+        "tick_count": 1506296,
+        "weekend_rows": 475
+      },
+      {
+        "ask_gte_bid_positive": true,
+        "duplicate_timestamps": 0,
+        "first_timestamp": "2026-02-01T22:00:00.000000Z",
+        "last_timestamp": "2026-02-27T21:59:00.000000Z",
+        "max_gap_minutes": 2885.0,
+        "monotonic_utc": true,
+        "path": "data/external/histdata/EURUSD/tick/EURUSD_2026_02_m1_bidask.csv",
+        "raw_bytes": 8545669,
+        "raw_path": "data/external/histdata/EURUSD/tick/raw/EURUSD_2026_02_tick.zip",
+        "raw_sha256": "b5fc20a90f4ecc91d72671392710a152d9fd9e2bbd7f362a8ec0d8d36d6cac9d",
+        "row_count": 28704,
+        "sha256": "11098aec0f9f10d136984f82708e9eaa0f54528a4e15937baf2e961827746da5",
+        "source_url": "https://www.histdata.com/download-free-forex-data/?/ascii/tick-data-quotes/EURUSD/2026/02",
+        "tick_count": 1330124,
+        "weekend_rows": 466
+      },
+      {
+        "ask_gte_bid_positive": true,
+        "duplicate_timestamps": 0,
+        "first_timestamp": "2026-03-01T22:00:00.000000Z",
+        "last_timestamp": "2026-04-01T04:59:00.000000Z",
+        "max_gap_minutes": 2941.0,
+        "monotonic_utc": true,
+        "path": "data/external/histdata/EURUSD/tick/EURUSD_2026_03_m1_bidask.csv",
+        "raw_bytes": 16770082,
+        "raw_path": "data/external/histdata/EURUSD/tick/raw/EURUSD_2026_03_tick.zip",
+        "raw_sha256": "fd53760021a387149aec3c6b0debb961eafff066e9ee7ebcf494c913e6632968",
+        "row_count": 31980,
+        "sha256": "7e999b697fab3ea49b565466b368315995ca28be96ec9664e59fa8a08693ba8c",
+        "source_url": "https://www.histdata.com/download-free-forex-data/?/ascii/tick-data-quotes/EURUSD/2026/03",
+        "tick_count": 2639808,
+        "weekend_rows": 760
+      },
+      {
+        "ask_gte_bid_positive": true,
+        "duplicate_timestamps": 0,
+        "first_timestamp": "2026-04-01T05:00:00.000000Z",
+        "last_timestamp": "2026-05-01T04:59:00.000000Z",
+        "max_gap_minutes": 2881.0,
+        "monotonic_utc": true,
+        "path": "data/external/histdata/EURUSD/tick/EURUSD_2026_04_m1_bidask.csv",
+        "raw_bytes": 11946794,
+        "raw_path": "data/external/histdata/EURUSD/tick/raw/EURUSD_2026_04_tick.zip",
+        "raw_sha256": "0d5652e4b8e335233be4f0c2cae93b34e78dd0d113851a5e73bb90757220f34e",
+        "row_count": 31532,
+        "sha256": "15e1369d96ea50c3674dc7bca91b78244dc1c962ebe27ed2ad2ec34904f3757b",
+        "source_url": "https://www.histdata.com/download-free-forex-data/?/ascii/tick-data-quotes/EURUSD/2026/04",
+        "tick_count": 1913533,
+        "weekend_rows": 461
+      },
+      {
+        "ask_gte_bid_positive": true,
+        "duplicate_timestamps": 0,
+        "first_timestamp": "2026-05-01T05:00:00.000000Z",
+        "last_timestamp": "2026-06-01T04:59:00.000000Z",
+        "max_gap_minutes": 2941.0,
+        "monotonic_utc": true,
+        "path": "data/external/histdata/EURUSD/tick/EURUSD_2026_05_m1_bidask.csv",
+        "raw_bytes": 9055562,
+        "raw_path": "data/external/histdata/EURUSD/tick/raw/EURUSD_2026_05_tick.zip",
+        "raw_sha256": "e07d491a3401e678bc9de37632a915d82fe57a82213f17cf7016303e68f30ac4",
+        "row_count": 29546,
+        "sha256": "97832959309ab1ac19400d6e2ff4fbdd114be59bc82140f751080e36a8c76470",
+        "source_url": "https://www.histdata.com/download-free-forex-data/?/ascii/tick-data-quotes/EURUSD/2026/05",
+        "tick_count": 1443885,
+        "weekend_rows": 584
+      },
+      {
+        "ask_gte_bid_positive": true,
+        "duplicate_timestamps": 0,
+        "first_timestamp": "2026-06-01T05:00:00.000000Z",
+        "last_timestamp": "2026-07-01T04:59:00.000000Z",
+        "max_gap_minutes": 2885.0,
+        "monotonic_utc": true,
+        "path": "data/external/histdata/EURUSD/tick/EURUSD_2026_06_m1_bidask.csv",
+        "raw_bytes": 8718488,
+        "raw_path": "data/external/histdata/EURUSD/tick/raw/EURUSD_2026_06_tick.zip",
+        "raw_sha256": "5aab06309fe390d711a2b547258228b7c12fa0c5151a931ff3701a1792cab79d",
+        "row_count": 31521,
+        "sha256": "dd244fe968231bf8fa1824db135a7644ca6da26163845f9d34419ff5374d50aa",
+        "source_url": "https://www.histdata.com/download-free-forex-data/?/ascii/tick-data-quotes/EURUSD/2026/06",
+        "tick_count": 1420993,
+        "weekend_rows": 453
+      },
+      {
+        "ask_gte_bid_positive": true,
+        "duplicate_timestamps": 4,
+        "first_timestamp": "2026-07-01T05:00:00.000000Z",
+        "last_timestamp": "2026-07-31T21:59:00.000000Z",
+        "max_gap_minutes": 2882.0,
+        "monotonic_utc": false,
+        "path": "data/external/histdata/EURUSD/tick/EURUSD_2026_07_m1_bidask.csv",
+        "raw_bytes": 5573051,
+        "raw_path": "data/external/histdata/EURUSD/tick/raw/EURUSD_2026_07_tick.zip",
+        "raw_sha256": "ba434e57730d953d2d434ed606cdd6f98d313aa58c50f80af8f52da00de3592d",
+        "row_count": 32538,
+        "sha256": "e269cc50b465a4888b604fdcbc4838d0c41035e743f96930af1afc85c478d00a",
+        "source_url": "https://www.histdata.com/download-free-forex-data/?/ascii/tick-data-quotes/EURUSD/2026/07",
+        "tick_count": 1380788,
+        "weekend_rows": 460
+      }
+    ]
+  },
+  "gate_results": [
+    {
+      "artifacts": [
+        "evidence/gates/eurusd-rq-v5-r0/evidence.json"
+      ],
+      "estimand": 215967.0,
+      "gate": "instrument",
+      "reason": "raw/normalized hashes verified; 4 duplicate minute rows deterministically consolidated",
+      "state": "pass",
+      "threshold": 1.0,
+      "uncertainty": {}
+    },
+    {
+      "artifacts": [
+        "evidence/gates/eurusd-rq-v5-r0/evidence.json"
+      ],
+      "estimand": 0.25208449138410227,
+      "gate": "target",
+      "reason": "next-hour volatility target is non-degenerate at frozen hourly epochs",
+      "state": "pass",
+      "threshold": 0.05,
+      "uncertainty": {}
+    },
+    {
+      "artifacts": [
+        "evidence/gates/eurusd-rq-v5-r0/evidence.json"
+      ],
+      "estimand": 0.0554,
+      "gate": "size",
+      "reason": "stationary-block null episode event with exact upper bound",
+      "state": "fail",
+      "threshold": 0.025,
+      "uncertainty": {
+        "lower": 0.050996412095652935,
+        "upper": 0.06006469705857514
+      }
+    },
+    {
+      "artifacts": [
+        "evidence/gates/eurusd-rq-v5-r0/evidence.json"
+      ],
+      "estimand": 0.20474887367051448,
+      "gate": "transport",
+      "reason": "four frozen dependence-aware equivalence comparisons with Holm adjustment",
+      "state": "fail",
+      "threshold": 0.1,
+      "uncertainty": {}
+    },
+    {
+      "artifacts": [
+        "evidence/gates/eurusd-rq-v5-r0/evidence.json"
+      ],
+      "estimand": null,
+      "gate": "power",
+      "reason": "smallest burst scale with exact lower detection bound >= 0.90",
+      "state": "fail",
+      "threshold": 0.9,
+      "uncertainty": {}
+    },
+    {
+      "artifacts": [
+        "evidence/gates/eurusd-rq-v5-r0/evidence.json"
+      ],
+      "estimand": 111.80339887498948,
+      "gate": "information",
+      "reason": "stationary-block e-value clears revision threshold",
+      "state": "pass",
+      "threshold": 40.0,
+      "uncertainty": {
+        "mi_lower": 0.12449782842052828,
+        "mi_upper": 0.17971117602206357
+      }
+    },
+    {
+      "artifacts": [
+        "evidence/gates/eurusd-rq-v5-r0/evidence.json"
+      ],
+      "estimand": 0.11007206635984204,
+      "gate": "value",
+      "reason": "paired mean-variance utility net of half-spread plus one-bp slippage",
+      "state": "pass",
+      "threshold": 0.0,
+      "uncertainty": {
+        "lower": 0.08313153297259625,
+        "upper": 0.14102051851812128
+      }
+    }
+  ],
+  "information": {
+    "alpha": 0.025,
+    "ci": [
+      0.12449782842052828,
+      0.17971117602206357
+    ],
+    "confidence_level": 0.975,
+    "e_value": 111.80339887498948,
+    "e_value_threshold": 40.0,
+    "gate_state": "pass",
+    "label_counts": {
+      "0": 2690,
+      "1": 701,
+      "2": 207
+    },
+    "mean_block": 16,
+    "miller_madow_mi": 0.15143583108983746,
+    "n": 3598,
+    "n_boot": 49999,
+    "n_decision_epochs": 3598,
+    "p_value": 2e-05,
+    "plugin_mi": 0.1511578989052905,
+    "reason": "stationary-block e-value clears revision threshold",
+    "reference": "stationary_block",
+    "seed_derivation": "sha256(spec_hash || NUL || domain_label)",
+    "sensitivity": {
+      "double": {
+        "ci": [
+          0.12019570166127416,
+          0.1843952256265562
+        ],
+        "confidence_level": 0.975,
+        "mean_block": 32,
+        "miller_madow_mi": 0.15143583108983746,
+        "n": 3598,
+        "n_boot": 49999,
+        "p_value": 2e-05,
+        "plugin_mi": 0.1511578989052905
+      },
+      "half": {
+        "ci": [
+          0.12734133387414215,
+          0.17640287263633025
+        ],
+        "confidence_level": 0.975,
+        "mean_block": 8,
+        "miller_madow_mi": 0.15143583108983746,
+        "n": 3598,
+        "n_boot": 49999,
+        "p_value": 2e-05,
+        "plugin_mi": 0.1511578989052905
+      }
+    },
+    "sensitivity_e_values": {
+      "double": 111.80339887498948,
+      "half": 111.80339887498948
+    },
+    "target_rate": 0.25208449138410227
+  },
+  "preregistration_commit": "514759f9f78569e167843fa3fde461db7075c8d0",
+  "schema_version": 1,
+  "spec_hash": "ef366a7e62fb2d54767dd8f38d6c1d0aad4d61eebd17c1cf8e894bcc0621c8f7",
+  "transport": {
+    "comparisons": [
+      {
+        "ci_95": [
+          0.14825320535081749,
+          0.16974352563123069
+        ],
+        "clock": "tick-count",
+        "comparison": "overall",
+        "estimand": 0.15890853695240476,
+        "holm_p_value": 1.0,
+        "margin": 0.1,
+        "n": 215967,
+        "raw_p_value": 1.0,
+        "state": "fail"
+      },
+      {
+        "ci_95": [
+          0.03029143341343816,
+          0.040853463723624445
+        ],
+        "clock": "tick-count",
+        "comparison": "extreme",
+        "estimand": 0.03535262331745128,
+        "holm_p_value": 8.783864239433554e-08,
+        "margin": 0.05,
+        "n": 215967,
+        "raw_p_value": 2.1959660598583884e-08,
+        "state": "pass"
+      },
+      {
+        "ci_95": [
+          0.19167187579583916,
+          0.21777979969161954
+        ],
+        "clock": "intrinsic-variance",
+        "comparison": "overall",
+        "estimand": 0.20474887367051448,
+        "holm_p_value": 1.0,
+        "margin": 0.1,
+        "n": 215967,
+        "raw_p_value": 1.0,
+        "state": "fail"
+      },
+      {
+        "ci_95": [
+          0.04585422772923641,
+          0.06004667379738571
+        ],
+        "clock": "intrinsic-variance",
+        "comparison": "extreme",
+        "estimand": 0.052799733292586366,
+        "holm_p_value": 1.0,
+        "margin": 0.05,
+        "n": 215967,
+        "raw_p_value": 0.7773247557820233,
+        "state": "fail"
+      }
+    ],
+    "n_boot": 9999,
+    "state": "fail"
+  },
+  "value": {
+    "ci": [
+      0.08313153297259625,
+      0.14102051851812128
+    ],
+    "gamma": 967531.0623251598,
+    "mean_cost": 1.4475268599192812e-05,
+    "n_boot": 49999,
+    "point": 0.11007206635984204
+  }
+}
