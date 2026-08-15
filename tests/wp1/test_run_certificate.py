@@ -411,3 +411,25 @@ def test_builtin_btc_workflow_loads_only_frozen_repository_evidence(tmp_path: Pa
     loaded = evaluate_gates(spec, tmp_path)
 
     assert [gate.gate for gate in loaded] == spec.required_gates
+
+
+def test_builtin_eurusd_workflow_loads_only_frozen_repository_evidence(tmp_path: Path) -> None:
+    from certificate.gates import evaluate_gates
+
+    spec = CertificateSpec.model_validate(_spec_dict(certificate_id="eurusd-workflow-fixture"))
+    spec.detector = "eurusd_rolling_quantile"
+    artifact = tmp_path / "evidence" / "gates" / spec.certificate_id / "evidence.json"
+    artifact.parent.mkdir(parents=True)
+    gates = [
+        {
+            "gate": gate,
+            "state": "fail",
+            "artifacts": [f"evidence/gates/{spec.certificate_id}/evidence.json"],
+        }
+        for gate in spec.required_gates
+    ]
+    artifact.write_text(json.dumps({"gate_results": gates}), encoding="utf-8")
+
+    loaded = evaluate_gates(spec, tmp_path)
+
+    assert [gate.gate for gate in loaded] == spec.required_gates

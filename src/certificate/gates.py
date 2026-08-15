@@ -13,6 +13,7 @@ GateWorkflow = Callable[[CertificateSpec, Path], list[GateResult]]
 _WORKFLOWS: dict[str, GateWorkflow] = {}
 _BUILTINS: dict[str, tuple[str, str]] = {
     "btc_vr_recentered_q2": ("scripts.wp1.btc_successor", "load_gate_results"),
+    "eurusd_rolling_quantile": ("scripts.wp1.eurusd_certificate", "load_gate_results"),
 }
 
 

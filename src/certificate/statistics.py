@@ -6,7 +6,7 @@ import math
 import numpy as np
 from scipy.stats import beta
 
-from certificate.information import primary_block_length, stationary_block_indices
+from certificate.information import _stationary_index_matrix, primary_block_length
 
 
 def exact_binomial_bounds(successes: int, draws: int, *, alpha: float) -> dict[str, float]:
@@ -38,10 +38,13 @@ def stationary_mean_interval(
     if arr.size == 0 or n_boot <= 0:
         raise ValueError("values and n_boot must be non-empty/positive")
     block = mean_block or primary_block_length(int(arr.size))
-    rng = np.random.default_rng(seed)
     means = np.empty(n_boot, dtype=np.float64)
-    for index in range(n_boot):
-        means[index] = float(np.mean(arr[stationary_block_indices(arr.size, block, rng)]))
+    rng = np.random.default_rng(seed)
+    batch_size = 512
+    for start in range(0, n_boot, batch_size):
+        stop = min(n_boot, start + batch_size)
+        indices = _stationary_index_matrix(arr.size, block, stop - start, rng)
+        means[start:stop] = np.mean(arr[indices], axis=1)
     lower, upper = np.quantile(means, [alpha / 2.0, 1.0 - alpha / 2.0])
     return float(lower), float(upper)
 
