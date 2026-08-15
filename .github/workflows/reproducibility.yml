@@ -1,0 +1,119 @@
+name: Full certificate reproducibility
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  btc-successor:
+    name: BTC successor — full frozen budgets
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: pip install -e ".[dev,extras,download]"
+
+      - name: Acquire the frozen June–July 2026 BTC span
+        run: >-
+          python -m scripts.wp1.download_binance_btc
+          --months 2026-06 2026-07
+          --out-dir data/external/binance/BTCUSDT/1m
+          --manifest /tmp/btc-download-manifest.json
+
+      - name: Regenerate full evidence
+        run: >-
+          python -m scripts.wp1.btc_successor
+          --spec specs/btcusdt-vr-q2-v5-r0.json
+          --out reproducibility-output/btc/evidence.json
+          --information-dir reproducibility-output/btc
+
+      - name: Compare immutable payload
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          def stable(value):
+              if isinstance(value, dict):
+                  return {key: stable(item) for key, item in value.items() if key != "created_at"}
+              if isinstance(value, list):
+                  return [stable(item) for item in value]
+              return value
+
+          expected = json.loads(Path("evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json").read_text())
+          actual = json.loads(Path("reproducibility-output/btc/evidence.json").read_text())
+          assert stable(actual) == stable(expected)
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: btc-successor-full-evidence
+          path: reproducibility-output/btc/
+
+  eurusd-certificate:
+    name: EUR/USD certificate — full frozen budgets
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: pip install -e ".[dev,extras,download]"
+
+      - name: Acquire frozen EUR/USD development and evaluation spans
+        shell: bash
+        run: |
+          python -m scripts.wp1.download_histdata_eurusd --symbol EURUSD --year 2021 --months 5 6 7 8 9 10 11 12 --aggregate minute --out-dir data/external/histdata/EURUSD/tick
+          for year in 2022 2023 2024 2025; do
+            python -m scripts.wp1.download_histdata_eurusd --symbol EURUSD --year "$year" --months 1 2 3 4 5 6 7 8 9 10 11 12 --aggregate minute --out-dir data/external/histdata/EURUSD/tick
+          done
+          python -m scripts.wp1.download_histdata_eurusd --symbol EURUSD --year 2026 --months 1 2 3 4 5 6 7 --aggregate minute --out-dir data/external/histdata/EURUSD/tick
+
+      - name: Regenerate full evidence
+        run: >-
+          python -m scripts.wp1.eurusd_certificate
+          --spec specs/eurusd-rq-v5-r0.json
+          --out reproducibility-output/eurusd/evidence.json
+
+      - name: Compare immutable payload
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          def stable(value):
+              if isinstance(value, dict):
+                  return {key: stable(item) for key, item in value.items() if key != "created_at"}
+              if isinstance(value, list):
+                  return [stable(item) for item in value]
+              return value
+
+          expected = json.loads(Path("evidence/gates/eurusd-rq-v5-r0/evidence.json").read_text())
+          actual = json.loads(Path("reproducibility-output/eurusd/evidence.json").read_text())
+          assert stable(actual) == stable(expected)
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eurusd-certificate-full-evidence
+          path: reproducibility-output/eurusd/

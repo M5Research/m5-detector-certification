@@ -61,6 +61,14 @@ jobs:
       - name: Run test suite
         run: python -m pytest -q
 
+      - name: Reduced deterministic certificate simulations
+        run: >-
+          python -m pytest -q
+          tests/wp1/test_stationary_block_information.py
+          tests/wp1/test_btc_successor.py
+          tests/wp1/test_eurusd_certificate.py
+          tests/wp1/test_run_certificate.py
+
       # The README advertises this as the command that validates every frozen
       # artifact. It silently selected zero tests for a while, so CI now
       # asserts it selects and passes a non-empty set.

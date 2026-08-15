@@ -1,6 +1,10 @@
 """Immutable certificate lineage and geometric error spending."""
 from __future__ import annotations
 
+import hashlib
+import json
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -13,6 +17,8 @@ from certificate.lineage import (
 )
 from certificate.models import CertificateSpec
 from certificate.serialize import spec_hash
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def _spec(**overrides: object) -> CertificateSpec:
@@ -135,3 +141,29 @@ def test_parent_spec_hash_must_match_parent() -> None:
 
     with pytest.raises(LineageError, match="parent_spec_hash"):
         validate_revision(child, parent)
+
+
+@pytest.mark.artifact
+def test_published_certificate_lineage_is_hash_bound_and_complete() -> None:
+    payload = json.loads(
+        (ROOT / "provenance" / "certificate-lineage.json").read_text(encoding="utf-8")
+    )
+    records = {row["certificate_id"]: row for row in payload["records"]}
+
+    expected = {
+        "btcusdt-vr-q2-v5-r0": (
+            "target_mismatched",
+            "26052a49a467a582dbb855612b3c5f5839a858f2fc8621a33ca2702e8c508964",
+        ),
+        "eurusd-rq-v5-r0": (
+            "size_distorted",
+            "ef366a7e62fb2d54767dd8f38d6c1d0aad4d61eebd17c1cf8e894bcc0621c8f7",
+        ),
+    }
+    for certificate_id, (disposition, frozen_spec_hash) in expected.items():
+        record = records[certificate_id]
+        artifact = ROOT / record["artifact"]
+        assert record["status"] == "confirmatory_complete"
+        assert record["disposition"] == disposition
+        assert record["spec_hash"] == frozen_spec_hash
+        assert hashlib.sha256(artifact.read_bytes()).hexdigest() == record["artifact_sha256"]

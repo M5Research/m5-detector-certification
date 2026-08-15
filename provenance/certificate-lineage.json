@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "protocol": "protocol-v5.0",
+  "records": [
+    {
+      "certificate_id": "btcusdt-vr-cascade-v4-historical",
+      "parent_certificate_id": null,
+      "spec_hash": null,
+      "evidence_revision": null,
+      "alpha": 0.05,
+      "artifact_sha256": "f2b7abd14bdcb8b07728771e0c1cf322f0a0326ec1d64788e622700fda501fed",
+      "disposition": "withheld",
+      "status": "historical_pre_v5"
+    },
+    {
+      "certificate_id": "btcusdt-vr-q2-exploratory-repair",
+      "parent_certificate_id": "btcusdt-vr-cascade-v4-historical",
+      "spec_hash": null,
+      "evidence_revision": null,
+      "alpha": null,
+      "artifact_sha256": "eb404be8c63c021ecd559d9b42da92a2f596a4a92b7997b21b8160857d20b49b",
+      "disposition": "superseded_exploratory",
+      "status": "unallocated_post_freeze_repair"
+    },
+    {
+      "certificate_id": "btcusdt-vr-q2-v5-r0",
+      "parent_certificate_id": "btcusdt-vr-q2-exploratory-repair",
+      "spec_hash": "26052a49a467a582dbb855612b3c5f5839a858f2fc8621a33ca2702e8c508964",
+      "evidence_revision": 0,
+      "alpha": 0.025,
+      "artifact": "certificates/btcusdt-vr-q2-v5-r0.json",
+      "artifact_sha256": "f751c69746758d712ffc3c9b535fed27494a8f91c32e171272577ed2c702a8eb",
+      "disposition": "target_mismatched",
+      "status": "confirmatory_complete"
+    },
+    {
+      "certificate_id": "eurusd-rq-v5-r0",
+      "parent_certificate_id": null,
+      "spec_hash": "ef366a7e62fb2d54767dd8f38d6c1d0aad4d61eebd17c1cf8e894bcc0621c8f7",
+      "evidence_revision": 0,
+      "alpha": 0.025,
+      "artifact": "certificates/eurusd-rq-v5-r0.json",
+      "artifact_sha256": "9211171ed807c440d4795e21c9b7cf1958c49688df6eeeeabada7deb32e72aa7",
+      "disposition": "size_distorted",
+      "status": "confirmatory_complete"
+    }
+  ]
+}

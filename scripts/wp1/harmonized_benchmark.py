@@ -462,25 +462,15 @@ def detector_contingent_information(
     n_perm: int = 1000,
     seed: int = 43,
 ) -> dict[str, Any]:
-    """Estimate detector-contingent MI against forward return sign.
+    """Compute descriptive MI and cost bounds for the non-certificate exhibit.
 
-    UNCERTAINTY IS OPTIMISTIC HERE, by construction. The forward returns are
-    taken bar-by-bar over the detector intersection, so consecutive
-    observations share q-1 of their q bars. The bootstrap and permutation
-    below resample those observations as if they were independent, which
-    understates the standard error and narrows the reported interval by
-    roughly sqrt(q) in the worst case.
-
-    The variance-ratio path does not have this problem:
-    `vr_holm_trigger_information` samples with stride W, so its observations
-    do not overlap. That is the version whose numbers the manuscript reports
-    as evidence.
-
-    This exhibit's disposition is `instrument_failure` for an unrelated reason
-    (the bounded HMM profile is degenerate), so no conclusion rests on the
-    interval width. If this estimate is ever promoted, sample with stride q or
-    switch the resampling to blocks of length >= q.
+    The forward returns overlap, so this path deliberately omits inferential
+    intervals and p-values. Certificate-grade information inference is supplied
+    only by the stationary-block module at non-overlapping decision epochs.
+    ``n_boot``, ``n_perm``, and ``seed`` remain accepted for CLI compatibility
+    with historical rebuild commands but are intentionally unused.
     """
+    del n_boot, n_perm, seed
     labels_arr = np.asarray(labels, dtype=np.int8)
     returns = np.asarray(forward_returns, dtype=np.float64)
     if labels_arr.shape != returns.shape:
@@ -489,28 +479,6 @@ def detector_contingent_information(
     x = labels_arr[valid]
     y = np.sign(returns[valid]).astype(np.int8)
     mi = _discrete_mi(x, y)
-    rng = np.random.default_rng(seed)
-
-    boot_values: list[float] = []
-    if len(x) > 0 and n_boot > 0:
-        for _ in range(n_boot):
-            idx = rng.choice(len(x), size=len(x), replace=True)
-            boot_values.append(_discrete_mi(x[idx], y[idx]))
-    if boot_values:
-        ci = np.quantile(np.asarray(boot_values), [0.025, 0.975]).tolist()
-    else:
-        ci = [mi, mi]
-
-    perm_values: list[float] = []
-    if len(x) > 0 and n_perm > 0:
-        for _ in range(n_perm):
-            perm_values.append(_discrete_mi(rng.permutation(x), y))
-    perm_p = (
-        float((np.sum(np.asarray(perm_values) >= mi) + 1) / (len(perm_values) + 1))
-        if perm_values
-        else None
-    )
-
     conditional: dict[str, dict[str, float | int | None]] = {}
     for state in range(n_states):
         state_returns = returns[valid & (labels_arr == state)]
@@ -527,8 +495,7 @@ def detector_contingent_information(
     return {
         "n": int(len(x)),
         "mi_nats": mi,
-        "bootstrap_ci_nats": [float(ci[0]), float(ci[1])],
-        "permutation_p": perm_p,
+        "inference_status": "omitted_noncertificate",
         "gross_bound_bps": float(gross_bps),
         "cost_bps": float(cost_bps),
         "net_bound_bps": float(gross_bps - cost_bps),
