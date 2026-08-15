@@ -416,6 +416,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--n-info-boot", type=int, default=49_999)
     parser.add_argument("--n-transport-boot", type=int, default=9_999)
+    parser.add_argument(
+        "--information-dir",
+        type=Path,
+        help="directory for separate q=2 and q=5 stationary-block artifacts",
+    )
     args = parser.parse_args(argv)
     spec = CertificateSpec.model_validate_json(args.spec.read_text(encoding="utf-8"))
     assert_preregistration(spec, repo=REPO_ROOT, spec_path=args.spec)
@@ -428,6 +433,29 @@ def main(argv: list[str] | None = None) -> int:
         raise FileExistsError(f"refusing to overwrite {args.out}")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    info_dir = args.information_dir or args.out.parent
+    info_dir.mkdir(parents=True, exist_ok=True)
+    for label in ("q2", "q5"):
+        info_path = info_dir / f"information-{label}.json"
+        if info_path.exists():
+            raise FileExistsError(f"refusing to overwrite {info_path}")
+        info_path.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "artifact": "btc_vr_stationary_block_information",
+                    "created_at": artifact["created_at"],
+                    "preregistration_commit": artifact["preregistration_commit"],
+                    "spec_hash": artifact["spec_hash"],
+                    "data_hashes": artifact["data_hashes"],
+                    "result": artifact["information"][label],
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
     print(f"Wrote {args.out}")
     return 0
 
