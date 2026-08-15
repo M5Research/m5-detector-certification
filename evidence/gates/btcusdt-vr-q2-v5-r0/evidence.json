@@ -1,0 +1,363 @@
+{
+  "artifact": "btcusdt_vr_q2_protocol_v5_evidence",
+  "calibration": {
+    "alpha": 0.025,
+    "cmde_90": 0.1,
+    "method": "Gaussian AR(1), 100 independent W=120 windows per draw, median q=2 VR departure",
+    "power": [
+      {
+        "amplitude": 0.0005,
+        "bounds": {
+          "lower": 0.016029647169849053,
+          "upper": 0.029422409482738002
+        },
+        "draws": 2000,
+        "fires": 44,
+        "phi": 7.784100159697928e-05,
+        "rate": 0.022
+      },
+      {
+        "amplitude": 0.001,
+        "bounds": {
+          "lower": 0.013902241892437854,
+          "upper": 0.026561528953912023
+        },
+        "draws": 2000,
+        "fires": 39,
+        "phi": 0.00015568200319395856,
+        "rate": 0.0195
+      },
+      {
+        "amplitude": 0.002,
+        "bounds": {
+          "lower": 0.012218892300887314,
+          "upper": 0.02425488947719146
+        },
+        "draws": 2000,
+        "fires": 35,
+        "phi": 0.0003113640063879171,
+        "rate": 0.0175
+      },
+      {
+        "amplitude": 0.005,
+        "bounds": {
+          "lower": 0.0143257869140669,
+          "upper": 0.027135577268658333
+        },
+        "draws": 2000,
+        "fires": 40,
+        "phi": 0.0007784100159697928,
+        "rate": 0.02
+      },
+      {
+        "amplitude": 0.01,
+        "bounds": {
+          "lower": 0.026054421067532103,
+          "upper": 0.042350446233080964
+        },
+        "draws": 2000,
+        "fires": 67,
+        "phi": 0.0015568200319395855,
+        "rate": 0.0335
+      },
+      {
+        "amplitude": 0.02,
+        "bounds": {
+          "lower": 0.026497089656563572,
+          "upper": 0.04290588488307623
+        },
+        "draws": 2000,
+        "fires": 68,
+        "phi": 0.003113640063879171,
+        "rate": 0.034
+      },
+      {
+        "amplitude": 0.05,
+        "bounds": {
+          "lower": 0.07034520016699762,
+          "upper": 0.09489669671628181
+        },
+        "draws": 2000,
+        "fires": 164,
+        "phi": 0.007784100159697928,
+        "rate": 0.082
+      },
+      {
+        "amplitude": 0.1,
+        "bounds": {
+          "lower": 0.998157260206594,
+          "upper": 1.0
+        },
+        "draws": 2000,
+        "fires": 2000,
+        "phi": 0.18611478629828157,
+        "rate": 1.0
+      },
+      {
+        "amplitude": 0.15,
+        "bounds": {
+          "lower": 0.998157260206594,
+          "upper": 1.0
+        },
+        "draws": 2000,
+        "fires": 2000,
+        "phi": 0.2975395206972948,
+        "rate": 1.0
+      }
+    ],
+    "power_state": "pass",
+    "recenter_center": -0.004886325945105274,
+    "recenter_scale": 0.010302944723275254,
+    "size": {
+      "bounds": {
+        "lower": 0.01613585570828982,
+        "upper": 0.0215495952966483
+      },
+      "draws": 10000,
+      "fires": 187,
+      "rate": 0.0187,
+      "state": "pass",
+      "threshold": 1.959963984540054
+    }
+  },
+  "created_at": "2026-08-15T09:27:45Z",
+  "data_hashes": {
+    "BTCUSDT-1m-2026-06.csv": "76141078aba500c43c34d841d262eb0b29141b3e183798cee56f25c1c3549e55",
+    "BTCUSDT-1m-2026-07.csv": "17327a92ca037d811cd9f96eb6622fcd959e4a860c9c78d48b69379cd9a416ee",
+    "vendor_manifest": "b4f8b053ed8b5c7378759626a2fa0cfdcdb0dce6f8eee31e89abd03d3ccfa2a9"
+  },
+  "gate_results": [
+    {
+      "artifacts": [
+        "evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json"
+      ],
+      "estimand": 87840.0,
+      "gate": "instrument",
+      "reason": "vendor checksums verified and normalized minutes contiguous",
+      "state": "pass",
+      "threshold": 87840.0,
+      "uncertainty": {}
+    },
+    {
+      "artifacts": [
+        "evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json"
+      ],
+      "estimand": -25.058738974423505,
+      "gate": "target",
+      "reason": "one-sided observed median q=2 M2 statistic under frozen recentering",
+      "state": "fail",
+      "threshold": 1.959963984540054,
+      "uncertainty": {}
+    },
+    {
+      "artifacts": [
+        "evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json"
+      ],
+      "estimand": 0.0187,
+      "gate": "size",
+      "reason": "exact one-sided Clopper-Pearson upper bound",
+      "state": "pass",
+      "threshold": 0.025,
+      "uncertainty": {
+        "lower": 0.01613585570828982,
+        "upper": 0.0215495952966483
+      }
+    },
+    {
+      "artifacts": [
+        "evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json"
+      ],
+      "estimand": 0.005390399884553143,
+      "gate": "transport",
+      "reason": "single frozen calendar-volume dependence-aware TOST",
+      "state": "fail",
+      "threshold": 0.019748,
+      "uncertainty": {
+        "lower": -0.007134131694836632,
+        "upper": 0.03502946425367903
+      }
+    },
+    {
+      "artifacts": [
+        "evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json"
+      ],
+      "estimand": 0.1,
+      "gate": "power",
+      "reason": "smallest declared amplitude with exact lower power bound >= 0.90",
+      "state": "pass",
+      "threshold": 0.9,
+      "uncertainty": {}
+    },
+    {
+      "artifacts": [
+        "evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json"
+      ],
+      "estimand": 0.8009077827960823,
+      "gate": "information",
+      "reason": "stationary-block e-value below revision threshold",
+      "state": "fail",
+      "threshold": 40.0,
+      "uncertainty": {
+        "mi_lower": 0.0,
+        "mi_upper": 0.005336284704735402
+      }
+    },
+    {
+      "artifacts": [
+        "evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json"
+      ],
+      "estimand": -4.10466682004709e-06,
+      "gate": "value",
+      "reason": "cost-free scientific trigger utility; no economic cost policy in scope",
+      "state": "fail",
+      "threshold": 0.0,
+      "uncertainty": {
+        "lower": -1.4764479579190845e-05,
+        "upper": 1.0208298874792956e-06
+      }
+    }
+  ],
+  "information": {
+    "q2": {
+      "alpha": 0.025,
+      "ci": [
+        0.0,
+        0.005336284704735402
+      ],
+      "confidence_level": 0.975,
+      "e_value": 0.8009077827960823,
+      "e_value_threshold": 40.0,
+      "gate_state": "fail",
+      "mean_block": 10,
+      "miller_madow_mi": 0.0011555110727020077,
+      "n": 731,
+      "n_boot": 49999,
+      "n_decision_epochs": 731,
+      "n_triggers": 4,
+      "p_value": 0.38974,
+      "plugin_mi": 0.000471516544658232,
+      "q": 2,
+      "reason": "stationary-block e-value below revision threshold",
+      "reference": "stationary_block",
+      "seed_derivation": "sha256(spec_hash || NUL || domain_label)",
+      "sensitivity": {
+        "double": {
+          "ci": [
+            0.0,
+            0.005252420859940618
+          ],
+          "confidence_level": 0.975,
+          "mean_block": 20,
+          "miller_madow_mi": 0.0011555110727020077,
+          "n": 731,
+          "n_boot": 49999,
+          "p_value": 0.39046,
+          "plugin_mi": 0.000471516544658232
+        },
+        "half": {
+          "ci": [
+            0.0,
+            0.005336284704735402
+          ],
+          "confidence_level": 0.975,
+          "mean_block": 5,
+          "miller_madow_mi": 0.0011555110727020077,
+          "n": 731,
+          "n_boot": 49999,
+          "p_value": 0.38684,
+          "plugin_mi": 0.000471516544658232
+        }
+      },
+      "sensitivity_e_values": {
+        "double": 0.8001690135453763,
+        "half": 0.8039042358848352
+      },
+      "trigger_rate": 0.005471956224350205
+    },
+    "q5": {
+      "alpha": 0.025,
+      "ci": [
+        0.0,
+        0.004514876636226422
+      ],
+      "confidence_level": 0.975,
+      "e_value": 0.6203741338997658,
+      "e_value_threshold": 40.0,
+      "gate_state": "fail",
+      "mean_block": 10,
+      "miller_madow_mi": 0.000853055140154942,
+      "n": 731,
+      "n_boot": 49999,
+      "n_decision_epochs": 731,
+      "n_triggers": 3,
+      "p_value": 0.64958,
+      "plugin_mi": 0.00016906061211116645,
+      "q": 5,
+      "reason": "stationary-block e-value below revision threshold",
+      "reference": "stationary_block",
+      "seed_derivation": "sha256(spec_hash || NUL || domain_label)",
+      "sensitivity": {
+        "double": {
+          "ci": [
+            0.0,
+            0.004569597301018137
+          ],
+          "confidence_level": 0.975,
+          "mean_block": 20,
+          "miller_madow_mi": 0.000853055140154942,
+          "n": 731,
+          "n_boot": 49999,
+          "p_value": 0.65154,
+          "plugin_mi": 0.00016906061211116645
+        },
+        "half": {
+          "ci": [
+            0.0,
+            0.004424637273377057
+          ],
+          "confidence_level": 0.975,
+          "mean_block": 5,
+          "miller_madow_mi": 0.000853055140154942,
+          "n": 731,
+          "n_boot": 49999,
+          "p_value": 0.6478,
+          "plugin_mi": 0.00016906061211116645
+        }
+      },
+      "sensitivity_e_values": {
+        "double": 0.6194403085470805,
+        "half": 0.6212258693380328
+      },
+      "trigger_rate": 0.004103967168262654
+    }
+  },
+  "observed": {
+    "critical": 1.959963984540054,
+    "median_z_m2": -0.2630651284335739,
+    "recentered_z": -25.058738974423505
+  },
+  "preregistration_commit": "514759f9f78569e167843fa3fde461db7075c8d0",
+  "schema_version": 1,
+  "spec_hash": "26052a49a467a582dbb855612b3c5f5839a858f2fc8621a33ca2702e8c508964",
+  "transport": {
+    "ci": [
+      -0.007134131694836632,
+      0.03502946425367903
+    ],
+    "estimand": 0.005390399884553143,
+    "margin": 0.019748,
+    "n_boot": 9999,
+    "n_calendar": 732,
+    "n_volume": 71,
+    "state": "fail",
+    "tost_p_value": 0.1872
+  },
+  "value": {
+    "ci": [
+      -1.4764479579190845e-05,
+      1.0208298874792956e-06
+    ],
+    "point": -4.10466682004709e-06,
+    "reason": "cost-free scientific trigger utility; no economic cost policy in scope"
+  }
+}

@@ -5,19 +5,18 @@ Implements the ROBUSTNESS detector specified in 01-PREREGISTRATION.md §7.2
 2026-06-02).
 
 CAUSALITY SCOPE — read before citing this detector as causal.
-  Inference is causal GIVEN THE PARAMETERS: labels come from
+  Filtering is causal GIVEN THE PARAMETERS: labels come from
   `filtered_marginal_probabilities` (the Hamilton forward filter) and never
-  from the Kim smoother. The parameters themselves are not causal. The EM fit
-  (means, switching variances, transition matrix), the ascending-variance state
-  ordering, and the log-domain floor are each estimated ONCE over the full
-  sample. A label at bar t therefore depends on data after t, through the
-  fitted parameters.
+  from the Kim smoother. The parameters themselves are not causal. The
+  full-sample fit (regime means, switching variances, and transition matrix),
+  the ascending-variance state ordering, and the log-domain floor are each
+  estimated ONCE over the full sample. A label at bar t therefore depends on
+  data after t through the fitted parameters, ordering, and floor.
 
-  This is the standard anchored full-sample Markov-switching convention and it
-  is an acceptable choice for a frozen measurement instrument, which is how the
-  manuscript uses it. It is NOT a real-time causal detector, and it must not be
-  used to evaluate out-of-sample predictability without refitting on an
-  expanding window with the state ordering fixed by the first window.
+  This anchored full-sample convention is suitable for the frozen measurement
+  instrument used by the manuscript. It is NOT a real-time causal detector and
+  must not be used to evaluate out-of-sample predictability unless parameters,
+  ordering, and the floor are fixed using only information available by bar t.
 
 Frozen primary parameters:
   rv_window=60, k_regimes=3, em_iter=100, search_reps=10, ewma=False,
@@ -34,7 +33,11 @@ Key implementation notes:
     RV before log transform (D-03); floor value recorded in §14.5 amendment.
   - 10 restarts via separate fit() calls (search_reps=0 each) to collect
     per-restart LLs for the §8b convergence trigger (RESEARCH.md PQ-5).
-  - §8b convergence trigger: top-5 LL spread ≥ 1% of |mean LL| → 2-state fallback.
+  - §8b convergence diagnostics: the class exposes finite-only restart metrics
+    and `convergence_ok_`, but never automatically refits to 2 states. Current
+    validation/regate callers may select a 2-state profile for timing/OOM policy
+    before or around fitting.
+    This policy does not react automatically to `convergence_ok_=False`.
 
 Phase boundary: pure computational unit. No gate, no predictability, no ε².
 This module does NOT import gate_analysis, predictability, or regate_analysis.
@@ -59,14 +62,19 @@ PINNED_SEED: int = 42  # recorded in §14.5 amendment + 03-VALIDATION.md
 
 
 class HMMDetector:
-    """Causal HMM Markov-switching volatility-regime detector.
+    """Anchored full-sample HMM volatility-regime detector.
 
     Implements the frozen §7.2 robustness detector spec (01-PREREGISTRATION.md,
     commit 169fc20) with the §14.5 HMM amendment bundle (D-02/D-03/D-06,
     2026-06-02).
 
     Labels: -1 = warmup, 0 = LOW, 1 = ELEVATED, 2 = EXTREME
-    Causality: Hamilton forward filter (filtered_marginal_probabilities ONLY).
+    Inference: Hamilton forward-filter probabilities are causal given fixed
+    parameters. This detector fits parameters, state ordering, and the log-RV
+    floor on the full sample, so the complete detector is not real-time causal.
+    The class exposes §8b convergence diagnostics only.
+    It never automatically refits to 2 states. Timing/OOM profile selection
+    remains caller-owned and is separate from `convergence_ok_`.
 
     Parameters
     ----------
@@ -110,7 +118,10 @@ class HMMDetector:
         self.trend = trend
         self.switching_trend = switching_trend
 
-        # Attributes set after fit()
+        self._reset_fit_state()
+
+    def _reset_fit_state(self) -> None:
+        """Clear all learned and failure-sensitive state before a fit attempt."""
         self.rv_: np.ndarray = np.array([], dtype=np.float64)
         self.log_rv_: np.ndarray = np.array([], dtype=np.float64)
         self.filtered_probs_: np.ndarray = np.array([], dtype=np.float64)
@@ -119,6 +130,8 @@ class HMMDetector:
         self.convergence_ok_: bool = False
         self.hmm_fallback_: str = "none"
         self.floored_bar_count_: int = 0
+        self.successful_restart_count_: int = 0
+        self.failed_restart_count_: int = 0
         # Variance-separation diagnostics (D-10)
         self.sigma2_sorted_: np.ndarray = np.array([], dtype=np.float64)
         self.ratio_elev_low_: float = float("nan")
@@ -128,7 +141,11 @@ class HMMDetector:
         self.spread_fraction_: float = float("nan")
 
     def fit(self, close: np.ndarray) -> np.ndarray:
-        """Compute causal int8 regime labels for the full close series.
+        """Compute anchored full-sample int8 regime labels.
+
+        This method exposes convergence diagnostics only.
+        It never automatically refits to 2 states.
+        Empty input returns an empty int8 array after clearing prior fit state.
 
         Parameters
         ----------
@@ -144,9 +161,13 @@ class HMMDetector:
         Raises
         ------
         ValueError
-            On empty (length 0 returns [] not an error), NaN/Inf values,
-            non-positive prices, or non-1-D input.
+            On NaN/Inf values, non-positive prices, non-1-D input, or fewer
+            than 2 finite log-RV observations after warmup.
+        RuntimeError
+            When every restart returns a non-finite log-likelihood, or when
+            the result lacks the filtered_marginal_probabilities API.
         """
+        self._reset_fit_state()
         close = np.asarray(close, dtype=np.float64)
 
         if close.size == 0:
@@ -179,6 +200,12 @@ class HMMDetector:
         floored_count = int(np.sum(rv_finite == 0))
         rv_floored = np.where(rv_finite > 0, rv_finite, floor_value)
         log_rv = np.log(rv_floored)
+        n_finite_log_rv = int(np.count_nonzero(np.isfinite(log_rv)))
+        if n_finite_log_rv < 2:
+            raise ValueError(
+                "HMMDetector requires at least 2 finite log-RV observations "
+                f"after warmup; got {n_finite_log_rv}."
+            )
 
         # Step 3: 10 restarts (search_reps=0 each) to collect per-restart LLs (§8b / PQ-5)
         # GC collect before the restart loop to free any fragmented memory (important for
@@ -239,35 +266,66 @@ class HMMDetector:
                 except Exception:
                     conv_i = True  # retry also failed — mark as failed
 
-            ll_values.append(res_i.llf)
-            conv_flags.append(conv_i)
-            results_list.append(res_i)
+            llf_i = float(res_i.llf)
+            if np.isfinite(llf_i):
+                ll_values.append(llf_i)
+                conv_flags.append(conv_i)
+                results_list.append(res_i)
+            else:
+                logger.debug("Restart %d returned non-finite llf=%r", i, llf_i)
+                ll_values.append(-float("inf"))
+                conv_flags.append(True)
+                results_list.append(None)
 
         # Step 4: §8b convergence trigger — top-5 LL spread
-        ll_arr = np.array(ll_values)
-        sorted_ll = np.sort(ll_arr)[::-1]  # descending (may contain -inf for failed restarts)
-        # Use top-5 if ≥5 restarts; otherwise use the full set (top-n spread)
-        n_for_spread = min(5, len(sorted_ll))
-        if n_for_spread < 2:
-            top5_spread = 0.0
-        else:
-            top5_spread = float(sorted_ll[0] - sorted_ll[n_for_spread - 1])
-        mean_ll_abs = float(abs(np.mean(ll_arr[np.isfinite(ll_arr)]))) if np.any(np.isfinite(ll_arr)) else float("inf")
-        spread_frac = top5_spread / mean_ll_abs if mean_ll_abs > 0 else float("inf")
-        any_persistent_conv = any(conv_flags)
-        convergence_ok = (spread_frac < 0.01) and not any_persistent_conv
-
-        # Best restart = highest LL among successful (non-None) restarts.
-        # Restarts that raised are already recorded as -inf, but a restart that
-        # "succeeds" while returning a NaN log-likelihood is not: np.argmax
-        # returns the index of the first NaN it sees, which would select a
-        # degenerate fit as the best one. Demote NaN to -inf first.
-        ll_arr = np.where(np.isnan(ll_arr), -np.inf, ll_arr)
-        if not np.any(np.isfinite(ll_arr)):
+        ll_arr = np.asarray(ll_values, dtype=np.float64)
+        finite_mask = np.isfinite(ll_arr)
+        successful_restart_count = int(np.count_nonzero(finite_mask))
+        failed_restart_count = int(len(ll_arr) - successful_restart_count)
+        self.successful_restart_count_ = successful_restart_count
+        self.failed_restart_count_ = failed_restart_count
+        if successful_restart_count == 0:
             raise RuntimeError(
                 "All HMM EM restarts returned a non-finite log-likelihood. "
                 "The input series may be too short, flat, or degenerate."
             )
+        finite_ll = ll_arr[finite_mask]
+        sorted_ll = np.sort(finite_ll)[::-1]
+        # Use the top 5 finite restarts, or every finite restart when fewer succeed.
+        n_for_spread = min(5, successful_restart_count)
+        if n_for_spread < 2:
+            top5_spread = 0.0
+        else:
+            with np.errstate(over="ignore", invalid="ignore"):
+                top5_spread = float(sorted_ll[0] - sorted_ll[n_for_spread - 1])
+            if not np.isfinite(top5_spread):
+                top5_spread = float(np.finfo(np.float64).max)
+
+        ll_scale = float(np.max(np.abs(finite_ll)))
+        if ll_scale == 0.0:
+            mean_ll_abs = 0.0
+        else:
+            mean_ll_abs = float(ll_scale * abs(np.mean(finite_ll / ll_scale)))
+        denominator_ok = mean_ll_abs > 0.0
+        if denominator_ok:
+            with np.errstate(over="ignore", invalid="ignore"):
+                spread_frac = float(top5_spread / mean_ll_abs)
+            if not np.isfinite(spread_frac):
+                spread_frac = float(np.finfo(np.float64).max)
+        else:
+            spread_frac = 0.0
+
+        required_success_count = min(5, self.search_reps)
+        enough_successes = successful_restart_count >= required_success_count
+        any_persistent_conv = any(conv_flags)
+        convergence_ok = (
+            denominator_ok
+            and enough_successes
+            and spread_frac < 0.01
+            and not any_persistent_conv
+        )
+
+        # Best restart = highest LL among successful (non-None) restarts
         best_idx = int(np.argmax(ll_arr))
         best_res = results_list[best_idx]
         if best_res is None:
@@ -282,15 +340,12 @@ class HMMDetector:
                     "The input series may be too short, flat, or degenerate."
                 )
 
-        # Step 5: runtime API check (§7.2 — required per statsmodels stability
-        # note). Not an assert: this guards against a third-party API change at
-        # runtime, and `python -O` strips asserts, which would turn a clear
-        # failure into an AttributeError further down.
+        # Step 5: runtime API guard (§7.2 — required per statsmodels stability note)
         if not hasattr(best_res, "filtered_marginal_probabilities"):
             raise RuntimeError(
-                "statsmodels API: filtered_marginal_probabilities not found on "
-                "the result object. statsmodels has flagged this module as "
-                "'not guaranteed stable' (§7.2)."
+                "statsmodels API: filtered_marginal_probabilities not found on result "
+                "object. statsmodels has flagged this module as 'not guaranteed stable' "
+                "(§7.2)."
             )
 
         # Step 6: variance-ascending relabeling (RESEARCH.md PQ-6 / D-08)
@@ -335,6 +390,8 @@ class HMMDetector:
         self.convergence_ok_ = convergence_ok
         self.hmm_fallback_ = "none"
         self.floored_bar_count_ = floored_count
+        self.successful_restart_count_ = successful_restart_count
+        self.failed_restart_count_ = failed_restart_count
         self.sigma2_sorted_ = sorted_sigmas.copy()
         self.ratio_elev_low_ = ratio_elev_low
         self.ratio_ext_elev_ = ratio_ext_elev

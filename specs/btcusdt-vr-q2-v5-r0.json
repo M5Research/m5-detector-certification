@@ -1,0 +1,59 @@
+{
+  "schema_version": "certificate-v1",
+  "certificate_id": "btcusdt-vr-q2-v5-r0",
+  "claim_id": "btcusdt-positive-serial-dependence-q2",
+  "evidence_revision": 0,
+  "parent_certificate_id": null,
+  "parent_spec_hash": null,
+  "patch_kind": "evidentiary",
+  "detector": "btc_vr_recentered_q2",
+  "instrument": "BTCUSDT",
+  "venue": "Binance USD-M",
+  "target": "positive short-horizon serial dependence",
+  "schemes": [
+    "calendar",
+    "volume"
+  ],
+  "horizon": 2,
+  "signal_family": "Gaussian AR(1) on 100 independent W=120 windows per draw",
+  "null_family": "Gaussian iid on 100 independent W=120 windows per draw",
+  "margins": {
+    "transport": 0.019748,
+    "power": 0.9,
+    "size": 0.025
+  },
+  "costs": {},
+  "required_gates": [
+    "instrument",
+    "target",
+    "size",
+    "transport",
+    "power",
+    "information",
+    "value"
+  ],
+  "preregistration_commit": "514759f9f78569e167843fa3fde461db7075c8d0",
+  "alpha": 0.025,
+  "protocol_id": "protocol-v5",
+  "thresholds": {
+    "W": 120,
+    "q": 2,
+    "recenter_center": -0.004886325945105274,
+    "recenter_scale": 0.010302944723275254,
+    "volume_threshold_btc": 1000,
+    "n_null": 10000,
+    "n_injection_per_cell": 2000,
+    "n_windows_per_draw": 100,
+    "amplitude_0": 0.0005,
+    "amplitude_1": 0.001,
+    "amplitude_2": 0.002,
+    "amplitude_3": 0.005,
+    "amplitude_4": 0.01,
+    "amplitude_5": 0.02,
+    "amplitude_6": 0.05,
+    "amplitude_7": 0.1,
+    "amplitude_8": 0.15,
+    "information_bootstrap_draws": 49999,
+    "transport_bootstrap_draws": 9999
+  }
+}

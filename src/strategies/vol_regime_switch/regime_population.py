@@ -139,20 +139,15 @@ def epsilon_sq_boot_ci(
         return point, float("nan"), float("nan")
     lo = float(np.quantile(boots, alpha / 2))
     hi = float(np.quantile(boots, 1 - alpha / 2))
-    # NOT clamped. The previous version forced lo <= point <= hi and justified
-    # it as "required by acceptance criteria". For a bounded statistic near its
-    # floor the percentile interval genuinely can exclude the observed value,
-    # but that is evidence of bootstrap bias, not a defect to edit out:
-    # clamping distorts the nominal coverage and suppresses the very diagnostic
-    # it reacts to. In a study arguing that instrument properties must be
-    # measured before use, bending an interval to satisfy an acceptance
-    # criterion is the one move that cannot be defended.
-    if not (lo <= point <= hi):
+    # Do not clamp a genuine percentile interval to its point estimate. For a
+    # bounded statistic near a boundary, the interval can legitimately exclude
+    # the observed value because of finite-sample bootstrap bias. Preserve the
+    # interval and surface that diagnostic instead of editing the endpoints.
+    if point < lo or point > hi:
         warnings.warn(
             f"percentile CI [{lo:.6g}, {hi:.6g}] excludes its point estimate "
-            f"{point:.6g}; epsilon^2 is bounded below at 0, so this is "
-            "expected near the floor and signals bootstrap bias rather than "
-            "an error",
+            f"{point:.6g}; epsilon^2 is bounded, so boundary effects can "
+            "produce bootstrap bias; this is a diagnostic rather than an error",
             RuntimeWarning,
             stacklevel=2,
         )

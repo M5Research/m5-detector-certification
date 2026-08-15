@@ -22,20 +22,32 @@ each CI run, so the ledger and the artifacts cannot drift apart again.
 
 ## Verification Pass
 
-Checked on 2026-06-26 against the repository working tree. All file-path artifacts cited in this ledger were found. Inline numeric values below were re-read from the cited JSON artifacts; rounded prose values match the source artifacts at the precision shown.
+Checked on 2026-08-15 against the repository working tree. All file-path artifacts cited in this ledger were found. Inline numeric values below were re-read from the cited JSON artifacts; rounded prose values match the source artifacts at the precision shown.
 
 | Area | Path Status | Number Status | Notes |
 |---|---|---|---|
 | Sensitivity and injection-recovery | Verified | Verified | Four cited injection JSON files report the stated `N_mc`, `n_fires`, `P_det`, and exact 95% intervals. |
 | Empirical null / size diagnostic | Verified | Verified with limitation | The manuscript now reports the focused `B=100` circular-block diagnostic; the broader multi-null smoke artifact remains a development harness and is not promoted as statistical validation. |
 | Gauge defect | Verified | Verified | `q=5` TOST comparisons report the stated differences, 90% intervals, and Holm non-equivalence decisions. |
-| Information and cost | Verified | Verified with limitation | Raw sign-pair bounds and VR trigger MI values match cited artifacts; the VR detector information is cost-exhausted under the 10 bps convention. |
+| Information and cost | Verified | Verified | Protocol-v5 records use stationary-block inference at the full frozen budget. The old IID-permutation VR trigger artifact is `legacy_noncertificate`. |
 | Holdout | Verified | Verified | Data span, bar count, primary-cell statistic, p-value, and `closed=false` match the holdout JSON. |
 | ETHUSDT external replication | Verified | Verified with limitation | Same-venue ETHUSDT symbol-swap artifact matches the manuscript table; it is not pooled with BTCUSDT and has no ETH-specific injection grid. |
 | Harmonized benchmark | Verified | Verified with limitation | Native-frequency BTC Q4 benchmark preserves 1-minute horizons; sparse HMM output is treated as execution diagnostic, not scientific evidence. |
-| EURUSD cost-gate sample | Verified | Verified with limitation | BTC/ETH-matched HistData bid/ask sample proves spread observability for the cost gate; it is not a full second-asset detector certificate. |
+| EURUSD certificate | Verified | Verified | The complete rolling-quantile certificate is `size_distorted`; all seven gate results and raw/normalized data hashes are frozen. |
 | Online GCDE | Regenerable | Verified by tests | `scripts/wp1/online_gcde.py` and `tests/wp1/test_online_gcde.py` define max-statistic sequential calibration, state transitions, causal windows, and gauge-uncertified transport handling. |
 | Prior manuscript sources | Verified | N/A | Prior TeX/Markdown sources exist and are framing/provenance sources, not new empirical evidence. |
+
+## Protocol-v5 Certificates
+
+| Record | Frozen specification | Evidence | Disposition |
+|---|---|---|---|
+| BTCUSDT VR `q=2`, revision 0 | `specs/btcusdt-vr-q2-v5-r0.json` | `evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json` | complete; `target_mismatched` |
+| EUR/USD rolling quantile, revision 0 | `specs/eurusd-rq-v5-r0.json` | `evidence/gates/eurusd-rq-v5-r0/evidence.json` | complete; `size_distorted` |
+
+Issued records are under `certificates/`; immutable ancestry, specification hashes,
+certificate hashes, revision numbers, and alpha allocations are recorded in
+`provenance/certificate-lineage.json`. Both specifications are first-commit snapshots,
+and both evidence sets were acquired only after the `protocol-v5.0` freeze tag.
 
 ## Sensitivity And Injection-Recovery
 
@@ -152,7 +164,7 @@ Gauge defect is a measured property of the detector-market pair, not a prose cav
 | Artifact | Status | Reuse In GCDE |
 |---|---|---|
 | `backtest_results/thermodynamic_bound/thermo_report_20260624_082448.json` | Existing raw sign-pair information artifact | Use only as a scale diagnostic; detector-specific claims use the VR trigger MI artifact. |
-| `backtest_results/thermodynamic_bound/vr_detector_mi.json` | New VR trigger MI artifact | Reports non-overlapping binary Holm-trigger MI for `q=2` and `q=5`, plus zero-entropy summaries for saturated Monte Carlo trigger cells. |
+| `backtest_results/thermodynamic_bound/vr_detector_mi.json` | `legacy_noncertificate` | Retained byte-unchanged for provenance. Its IID-permutation inference is not used by protocol-v5 certificates. |
 | `scripts/wp1/vr_detector_mi.py` | New detector MI runner | Computes detector-contingent MI for discrete VR trigger labels and writes a reproducible JSON artifact. |
 | `tests/wp1/test_vr_detector_mi.py` | New tests | Guards zero-entropy behavior for saturated injection cells. |
 | `scripts/wp1/thermodynamic_bound.py` | Existing information-cost script | Refactor toward detector-output inputs. |
@@ -267,7 +279,7 @@ The EURUSD sample proves that free high-frequency FX data can carry executable b
 
 ## Prior Manuscript Sources
 
-The current GCDE submission package does not require the old
+The current certification submission package does not require the old
 `docs/research/calibrated-detector-exclusion` folder to compile or to reproduce
 the bounded evidence map. The prior manuscript sources below are provenance
 notes only; they identify where wording and framing originated before the GCDE
@@ -290,5 +302,5 @@ version became the authoritative submission folder.
 | High-resolution size certificate | `alpha_D_star` under the declared dependence-preserving nulls with sufficient Monte Carlo resolution for production claims. |
 | Detector-contingent MI | Broader `I(label_t; Y)`, `I(trigger_t; Y)`, `I(stat_bin_t; Y)` estimates beyond the VR q=2/q=5 trigger artifact and Q4 benchmark. |
 | Real benchmark | Extend the Q4 non-smoke artifact to Markov-switching variance if retained. |
-| EURUSD robustness | Execute the detector gates on HistData Generic ASCII tick bid/ask data; do not use FRED/ECB daily reference rates for cost-gate evidence. |
+| Further EUR/USD revisions | Freeze a new evidentiary revision and geometric alpha slice before changing the detector, null, margins, clocks, or cost policy; the existing `size_distorted` certificate remains immutable. |
 | Failure fingerprint | Per-cell counts for sign gate, multiplicity gate, empirical-size failure, gauge failure, target mismatch, and cost exhaustion. |

@@ -14,8 +14,10 @@ claim, measures five operating characteristics — power, empirical size, cross-
 transport, detector-output information, and net information value — then returns an
 auditable certificate with a disposition and a gate-level failure profile.
 
-The worked instrument is a Holm-corrected Lo–MacKinlay variance-ratio cascade on
-BTCUSDT one-minute perpetual futures. It is an example instrument, not the contribution.
+The worked records are a Holm-corrected Lo–MacKinlay variance-ratio cascade on
+BTCUSDT one-minute perpetual futures and a rolling-quantile detector on EUR/USD
+bid/ask ticks. They are example instruments; the executable certification framework,
+immutable lineage, and refusal precedence are the contribution.
 
 ## Two levels of reproduction
 
@@ -41,17 +43,20 @@ regeneration commands (with the download scripts and pre-declared parameters) ar
 |---|---|---|---|
 | §4.2 Power | 96-cell exclusion grid (δ≤0.10 all silent); disclosed exploratory positive controls; cMDE bracket | `data/injection_runs/inj_d*_q*_W*.json` | `scripts/wp1/signal_injection.py`, `scripts/wp1/gate_analysis.py` |
 | §4.3 Size | empirical circular-block null; zero false alarms; mis-centered asymptotic reference | `backtest_results/empirical_vr_null/empirical_vr_null_20260623_230753.json` | `scripts/wp1/empirical_vr_null.py` |
-| §4.4 Transport | equivalence certified at q=2, fails at q=5 (all three clock pairs) | `backtest_results/gauge_invariance/gauge_report_20260624_221834.json` | `scripts/wp1/gauge_invariance.py` |
-| §4.5 Information & net value | detector-output MI `I_D`; per-epoch vs per-trigger net-value sign flip | `backtest_results/thermodynamic_bound/vr_detector_mi.json` (raw-scale diagnostic: `thermo_report_20260624_082448.json`) | `scripts/wp1/vr_detector_mi.py` |
+| §4.4 Transport | historical v4 diagnostic: two of three q=2 pairs and no q=5 pairs certify | `backtest_results/gauge_invariance/gauge_report_mde_margin.json` | `scripts/wp1/gauge_invariance.py` |
+| §4.5 Information & net value | protocol-v5 stationary-block inference; BTC q2/q5 fail | `evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json` | `scripts/wp1/btc_successor.py` |
 | §4.6 2026 window | temporally-disjoint holdout disposition | `backtest_results/holdout/holdout_confirmatory_20260623_175305.json` | `scripts/wp1/holdout_confirmatory.py` |
 | §4.8 Repair | recentering lowers cMDE 0.15→0.02 (q=2), 0.30→0.10 (q=5) | `backtest_results/reference_repair/recentered_reference_repair_20260710.json` | exact offline re-thresholding of frozen per-draw `median_z_m2` (see note) |
 | §5 Three families | rolling-quantile / HMM / VR-cascade dispositions | `backtest_results/harmonized_benchmark/harmonized_benchmark_q4_2022_btc_minimal_hmm.json` | `scripts/wp1/harmonized_benchmark.py` |
 | App. B ETH | ETHUSDT external replication | `backtest_results/asset_replication/eth_replication_20260625_224506.json` | `scripts/wp1/eth_replication.py` |
-| App. C EUR/USD | cost-gate spread observability | `backtest_results/eurusd/eurusd_histdata_cost_gate_matched_20210529_20251231_summary.json` | `scripts/wp1/eurusd_cost_gate_summary.py` |
+| §6 EUR/USD | complete seven-gate rolling-quantile certificate; `size_distorted` | `certificates/eurusd-rq-v5-r0.json` | `scripts/wp1/eurusd_certificate.py` |
+| Protocol-v5 BTC | complete successor certificate; `target_mismatched` | `certificates/btcusdt-vr-q2-v5-r0.json` | `scripts/wp1/btc_successor.py` |
 
-**E-value certificate (§3.4).** The gate e-values (E = 2.17 at q=2, E = 15.8 at q=5) are
-the a-priori calibrator `f_κ(p) = κ·p^(κ−1)` at κ = ½ applied to the information-gate
-permutation p-values (p = 0.053 at q=2, p = 0.001 at q=5) recorded in `vr_detector_mi.json`.
+**E-value certificate (§3.4).** Certificate-grade information inference uses a
+stationary-block null with `B=49,999`, not IID permutation. At revision 0 the BTC
+successor returns `E=0.801` at q=2 and `E=0.620` at q=5 (both fail the threshold 40),
+while EUR/USD returns `E=111.803` (pass). The older `vr_detector_mi.json` is retained
+only as `legacy_noncertificate` provenance.
 
 **Repair (§4.8).** No new simulation is needed: because each injection cell stores its
 per-draw, per-horizon `median_z_m2`, the recentered decision rule is applied by exact
@@ -66,7 +71,9 @@ m5-detector-certification/
 ├── scripts/wp1/                        analysis, gate, and figure scripts
 ├── backtest/                           minimal path/time helpers (backtest.utils)
 ├── data/injection_runs/                frozen signal-injection grid (104 cells) + precompute
-├── backtest_results/                   frozen gate artifacts (size, transport, MI, holdout, repair, benchmark, …)
+├── specs/, certificates/, evidence/    protocol-v5 claim tuples, records, and gate evidence
+├── provenance/                         upstream snapshot, acquisition, and certificate lineage
+├── backtest_results/                   historical frozen diagnostics and legacy artifacts
 ├── tests/wp1/                          artifact-validation and unit tests
 ├── requirements.txt
 └── pyproject.toml
@@ -84,8 +91,9 @@ Raw market data are **not redistributed** (vendor terms):
 - **HistData EUR/USD** ticks: fetch with `scripts/wp1/download_histdata_eurusd.py`
   (commands in `paper/REPRODUCTION.md`).
 
-The frozen JSON artifacts and the injection `.npz` precompute (derived statistics, not
-raw quotes) **are** included, so the paper's results reproduce with no raw data.
+The compact acquisition manifests, frozen JSON evidence, certificates, and injection
+`.npz` precompute (derived statistics, not raw quotes) **are** included, so the paper's
+reported results and provenance checks reproduce with no raw market data.
 
 ## Provenance and claim boundaries
 

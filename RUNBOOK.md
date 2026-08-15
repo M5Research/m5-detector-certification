@@ -45,8 +45,8 @@ Select-String -Path main.log -Pattern 'undefined|Overfull|LaTeX Error|Emergency 
 Set-Location ..
 ```
 
-Expected: `paper/main.pdf` (24 pages); no undefined references/citations, no LaTeX
-errors, no overfull boxes.
+Expected: `paper/main.pdf`; no undefined references/citations, no LaTeX errors, and no
+overfull boxes.
 
 ## 3. Run the verification suite
 
@@ -69,7 +69,10 @@ python -m pytest `
   tests/wp1/test_harmonized_benchmark.py `
   tests/wp1/test_eth_replication.py `
   tests/wp1/test_eurusd_cost_gate_summary.py `
-  tests/wp1/test_histdata_eurusd.py
+  tests/wp1/test_histdata_eurusd.py `
+  tests/wp1/test_stationary_block_information.py `
+  tests/wp1/test_certificate_lineage.py `
+  tests/wp1/test_protocol_v5_artifacts.py
 ```
 
 (`tests/wp1/test_online_gcde.py` covers a legacy sequential-replay driver retained for
@@ -84,6 +87,11 @@ Test-Path backtest_results/empirical_vr_null/empirical_vr_null_20260623_230753.j
 Test-Path backtest_results/gauge_invariance/gauge_report_20260624_221834.json
 Test-Path backtest_results/thermodynamic_bound/vr_detector_mi.json
 Test-Path backtest_results/reference_repair/recentered_reference_repair_20260710.json
+Test-Path evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json
+Test-Path evidence/gates/eurusd-rq-v5-r0/evidence.json
+Test-Path certificates/btcusdt-vr-q2-v5-r0.json
+Test-Path certificates/eurusd-rq-v5-r0.json
+Test-Path provenance/certificate-lineage.json
 Test-Path paper/CLAIM_TRACEABILITY.md
 ```
 
@@ -103,6 +111,10 @@ python scripts/wp1/vr_detector_mi.py --symbol BTCUSDT --start 2021-01-01 --end 2
 python scripts/wp1/holdout_confirmatory.py --confirm-jef-draft
 python scripts/wp1/eth_replication.py --symbol ETHUSDT
 python scripts/wp1/harmonized_benchmark.py --out backtest_results/harmonized_benchmark/harmonized_benchmark_rebuild.json --symbol BTCUSDT --start 2022-10-01 --end 2022-12-31 --detectors rolling_quantile hmm vr_cascade --W 120 --q 5 --hmm-regimes 2
+python -m scripts.wp1.btc_successor --spec specs/btcusdt-vr-q2-v5-r0.json --out evidence/rebuild/btc-evidence.json --information-dir evidence/rebuild/btc-information
+python -m scripts.wp1.eurusd_certificate --spec specs/eurusd-rq-v5-r0.json --out evidence/rebuild/eurusd-evidence.json
+python -m scripts.wp1.run_certificate --spec specs/btcusdt-vr-q2-v5-r0.json --out certificates/btcusdt-vr-q2-v5-r0-rebuild.json
+python -m scripts.wp1.run_certificate --spec specs/eurusd-rq-v5-r0.json --out certificates/eurusd-rq-v5-r0-rebuild.json
 ```
 
 The BTC/ETH runs expect local Binance USD-M parquet under
@@ -117,8 +129,9 @@ before any deployment certificate.
 
 ## 6. Claim boundary
 
-The package supports audit of the paper's bounded method claims. It does not claim
-Bitcoin inefficiency, trading profitability, detector optimality, or a completed
-production certificate across every detector, asset, clock, and cost schedule. The one
-`admissible` disposition (§4.8) is an exploratory, post-freeze result for a bounded
-q=2 scientific claim, not a confirmatory or economic certificate.
+The package supports audit of the paper's bounded method claims and two complete
+protocol-v5 certificates. Neither record is admissible: BTC is `target_mismatched` and
+EUR/USD is `size_distorted`. The historical repaired q=2 record is
+`superseded_exploratory`, not a confirmatory admission. The package does not claim
+Bitcoin inefficiency, trading profitability, detector optimality, or validity beyond
+the frozen claim tuples.

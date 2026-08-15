@@ -233,7 +233,9 @@ def test_detector_contingent_information_reports_cost_adjusted_bound() -> None:
 
     assert result["mi_nats"] > 0.0
     assert result["gross_bound_bps"] > result["net_bound_bps"]
-    assert result["bootstrap_ci_nats"][0] <= result["mi_nats"] <= result["bootstrap_ci_nats"][1]
+    assert result["inference_status"] == "omitted_noncertificate"
+    assert "bootstrap_ci_nats" not in result
+    assert "permutation_p" not in result
     assert set(result["conditional_forward_return"].keys()) == {"0", "1"}
 
 

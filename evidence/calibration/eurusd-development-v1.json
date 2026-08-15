@@ -1,0 +1,31 @@
+{
+  "artifact": "eurusd_development_calibration",
+  "consolidation": {
+    "duplicate_rows": 240,
+    "input_rows": 1659616,
+    "output_rows": 1659376
+  },
+  "data_hashes": {
+    "eurusd-histdata-2021-manifest.json": "ad311aa91d159d637d08abf63f4a98e2b5c98cb0c783faef519cc9466f311212",
+    "eurusd-histdata-2022-manifest.json": "e09432dab7bb9ed239751e351e10abb0a476e8e51820c911d796905533f17c1d",
+    "eurusd-histdata-2023-manifest.json": "a211a0213aec383c8e5d2bda8174976c35784696a9d1f1e569591045f9007c96",
+    "eurusd-histdata-2024-manifest.json": "d03f20f5631feb3a49a91396c289586770d3f97d97944f3d890538c99f0d0871",
+    "eurusd-histdata-2025-manifest.json": "c46eaaf368196f9c2ecb8563f43953a300ac47123d7054eb1a0835b53aa7cad6"
+  },
+  "detector": {
+    "p_elevated": 0.75,
+    "p_extreme": 0.95,
+    "pct_window": 43200,
+    "rv_window": 60,
+    "strict_extreme": true
+  },
+  "development_span": {
+    "end": "2025-12-31T23:59:59Z",
+    "start": "2021-05-30T00:00:00Z"
+  },
+  "gamma": 967531.0623251598,
+  "intrinsic_variance_threshold": 1.8692161290893694e-08,
+  "n_minutes": 1659376,
+  "schema_version": 1,
+  "tick_threshold": 68
+}

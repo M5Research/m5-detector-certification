@@ -1,0 +1,67 @@
+{
+  "schema_version": "certificate-v1",
+  "certificate_id": "eurusd-rq-v5-r0",
+  "claim_id": "eurusd-next-hour-volatility-state",
+  "evidence_revision": 0,
+  "parent_certificate_id": null,
+  "parent_spec_hash": null,
+  "patch_kind": "evidentiary",
+  "detector": "eurusd_rolling_quantile",
+  "instrument": "EURUSD",
+  "venue": "HistData Generic ASCII tick quotes",
+  "target": "next-hour realized volatility exceeds its causal trailing-30-day 75th percentile",
+  "schemes": [
+    "calendar",
+    "tick-count",
+    "intrinsic-variance"
+  ],
+  "horizon": 60,
+  "signal_family": "six-hour multiplicative volatility bursts on development returns",
+  "null_family": "stationary-block resampled development returns",
+  "margins": {
+    "power": 0.9,
+    "size": 0.025,
+    "transport_overall": 0.1,
+    "transport_extreme": 0.05
+  },
+  "costs": {
+    "slippage": 0.0001
+  },
+  "required_gates": [
+    "instrument",
+    "target",
+    "size",
+    "transport",
+    "power",
+    "information",
+    "value"
+  ],
+  "preregistration_commit": "514759f9f78569e167843fa3fde461db7075c8d0",
+  "alpha": 0.025,
+  "protocol_id": "protocol-v5",
+  "thresholds": {
+    "rv_window": 60,
+    "pct_window": 43200,
+    "p_elevated": 0.75,
+    "p_extreme": 0.95,
+    "strict_extreme": 1,
+    "horizon_minutes": 60,
+    "tick_threshold": 68,
+    "intrinsic_variance_threshold": 1.8692161290893694e-08,
+    "gamma": 967531.0623251598,
+    "duplicate_policy_keep_last_sum_ticks": 1,
+    "burst_minutes": 360,
+    "response_minutes": 60,
+    "extreme_occupancy": 0.5,
+    "scale_0": 1.25,
+    "scale_1": 1.5,
+    "scale_2": 2,
+    "scale_3": 3,
+    "scale_4": 4,
+    "n_injection_per_cell": 2000,
+    "n_null": 10000,
+    "information_bootstrap_draws": 49999,
+    "transport_bootstrap_draws": 9999,
+    "value_bootstrap_draws": 49999
+  }
+}

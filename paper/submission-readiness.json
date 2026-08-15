@@ -1,0 +1,42 @@
+{
+  "title": "Certifying Regime Detectors Before Use",
+  "generated_at": "2026-08-14",
+  "issues": [
+    {
+      "id": 1,
+      "name": "certificate_completeness_and_rolling_quantile_disposition",
+      "pass": true,
+      "reason": "The historical benchmark row remains incomplete, while the separate protocol-v5 EUR/USD rolling-quantile record executes all seven gates and is mechanically classified size_distorted."
+    },
+    {
+      "id": 2,
+      "name": "stationary_block_information_replaces_permutation",
+      "pass": true,
+      "reason": "BTC q=2/q=5 and EUR/USD certificate evidence use the stationary-block reference at B=49,999; schemas and outputs contain no permutation_p."
+    },
+    {
+      "id": 3,
+      "name": "gauge_rr_related_work_qualified",
+      "pass": true,
+      "reason": "NIST Gauge R&R and ISO 5725-1:2023 are cited; novelty is bounded to the joint financial-detector certificate."
+    },
+    {
+      "id": 4,
+      "name": "before_use_capitalization",
+      "pass": true,
+      "reason": "The local LaTeX, package, Zenodo, and supporting records use the exact title; the live Crossref record for DOI 10.2139/ssrn.7100358 was verified exact on 2026-08-15 and resolves to the SSRN DOI URL."
+    },
+    {
+      "id": 5,
+      "name": "q2_successor_not_post_hoc_admission",
+      "pass": true,
+      "reason": "The historical repair is superseded_exploratory; its protocol-v5 successor uses evidence revision 0, alpha_0=0.025, previously unseen June/July 2026 data, and is complete with disposition target_mismatched."
+    },
+    {
+      "id": 6,
+      "name": "complete_eurusd_rolling_quantile_certificate",
+      "pass": true,
+      "reason": "The frozen EUR/USD claim executes all seven gates on the previously unseen 2026 evaluation span and produces a complete size_distorted certificate."
+    }
+  ]
+}

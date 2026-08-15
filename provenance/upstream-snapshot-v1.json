@@ -1,0 +1,25 @@
+{
+  "commit": "b6911cf9812e9eafad269a44c92d77a5c95fabc3",
+  "dependencies": {
+    "numpy": "2.4.6",
+    "python": "3.12.13",
+    "scipy": "1.17.1",
+    "statsmodels": "0.14.6"
+  },
+  "export_tool": "scripts/wp1/export_upstream_snapshot.py@v1",
+  "exported_at": "2026-08-15T08:45:06Z",
+  "files": {
+    "scripts/wp1/gauge_bars.py": "1cde822c4b055087454117351af4dd4b93445eecf0a1bf9224cbc5b0e31a63f7",
+    "src/strategies/vol_regime_switch/defaults.py": "223a2668645fcdb4fda73082812f8c6fd4f14eae76264fddab434b7b991a7ec7",
+    "src/strategies/vol_regime_switch/hmm_detector.py": "f303ac86b6f8d182b3da9a18896d5412a5c4e3411e7bb50186d1906072aed5eb",
+    "src/strategies/vol_regime_switch/realized_vol.py": "584bf426a3b235b8534077cd740e741f5fd6f3ce64ea399a6a282388e2e12ef1",
+    "src/strategies/vol_regime_switch/regime_detector.py": "5a7ca576e413bdba65860435024ded1e36c4f7e5b6235d100189b43cd8a36261",
+    "src/strategies/vol_regime_switch/regime_engine.py": "50aa1490b7d65121e88e2edf9e7efeaced22f1fd4194ad3fcfa9159a17c2cc7c",
+    "src/strategies/vol_regime_switch/regime_population.py": "e1f68ab0f0fa0e67d8c2968215900c2866c304eaa2f1dc74f1eb9de924ab21cb",
+    "src/strategies/vol_regime_switch/rolling_quantile_detector.py": "1c60e10551741403db0002dd2130c7ad731cfaae39ca8719ca46fc6844f8c078",
+    "src/strategies/vol_regime_switch/strategy_modules.py": "1c2271156ff5a2ca739cc07382ebd6f6ecb0d8a855de2c1ce9d6aef29199490e"
+  },
+  "release_tag": "jfds-detector-core-v1.0.0",
+  "schema_version": "upstream-snapshot-v1",
+  "source_url": "https://github.com/M5Research/VolRegime-Engine.git"
+}
