@@ -1,8 +1,7 @@
 """Tests for the recentered-reference repair (§4.8, claim C9).
 
-The repair supports the only positive result in the paper and the protocol's
-first admissible certificate, so it gets the same treatment as the negative
-results: an executable generator and tests over the frozen artifact.
+The repair is a superseded exploratory record, not a protocol-v5 admission.
+It still needs an executable generator and tests over the frozen artifact.
 """
 from __future__ import annotations
 
@@ -11,7 +10,6 @@ import json
 import numpy as np
 import pytest
 
-from backtest.utils import PROJECT_ROOT
 from scripts.wp1.reference_repair import (
     ALPHA,
     FROZEN_ARTIFACT,

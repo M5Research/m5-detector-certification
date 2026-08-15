@@ -5,6 +5,11 @@ measure the same market state after controlling obvious sources of disagreement:
 state vocabulary, timestamp intersection, mapping, validity gates, and economic
 side-information tests.
 
+Protocol v5: this exhibit is explicitly non-certificate. Per-family certificate
+dispositions are produced by ``certificate.disposition``, not by this module.
+The rolling-quantile row is incomplete because required gates were not run.
+Existing committed JSON artifacts are frozen and must not be overwritten.
+
 The default CLI path used in tests is ``--smoke``. Full BTCUSDT runs are wired
 through the same artifact builder but are intentionally explicit because HMM/MS
 fits can be slow on the full 2021-2025 span.

@@ -60,18 +60,22 @@
 \cortext[cor1]{Corresponding author.}
 
 \begin{abstract}
-Value-at-risk forecasts are backtested before they are trusted; regime
-detectors, whose labels and triggers enter inference and allocation just as
-directly, face no analogous pre-use validation. We propose one. A
-certification protocol treats a frozen detector as a measurement instrument
-and, for a single pre-declared claim, measures five operating
-characteristics: power against a declared signal family (by controlled signal
-injection), false-alarm behavior under dependence-preserving resampled nulls,
-equivalence of outputs across calendar, volume, and event-time bars within a
-preregistered margin, detector-output information about the declared target,
-and the net value of that information under a declared cost convention. The
-protocol returns a certificate with a disposition and a gate-level failure
-profile, and refuses comparisons between detectors whose targets differ.
+Value-at-risk forecasts are backtested before they are trusted; measurement
+systems more broadly are characterized before use, including Gauge R\&R
+studies of repeatability and reproducibility \citep{NISTGaugeRR} and the
+ISO~5725 accuracy framework \citep{ISO5725-1:2023}. No identified financial
+framework jointly binds power, size, transport, target information, and
+decision value to one frozen detector-output claim with refusal precedence.
+We propose one. A certification protocol treats a frozen detector as a
+measurement instrument and, for a single pre-declared claim, measures five
+operating characteristics: power against a declared signal family (by
+controlled signal injection), false-alarm behavior under
+dependence-preserving resampled nulls, equivalence of outputs across
+calendar, volume, and event-time bars within a preregistered margin,
+detector-output information about the declared target, and the net value of
+that information under a declared cost convention. The protocol returns a
+certificate with a disposition and a gate-level failure profile, and refuses
+comparisons between detectors whose targets differ.
 
 We first certify a Holm-corrected variance-ratio cascade on BTCUSDT
 one-minute perpetual futures (\dataspan; $n=\numbars$ bars) and withhold the
@@ -84,15 +88,19 @@ and trigger information has a net value whose sign depends on the
 cost-attribution convention. We then show the diagnosis is actionable:
 recentering the decision statistic on the empirical null lowers the certified
 minimum detectable effect roughly tenfold---from $0.15$ to $0.02$ at
-$q{=}2$---restores size control, and yields the protocol's first
-\emph{admissible} certificate, for a bounded and now adequately powered
-exclusion of positive short-horizon serial dependence. Casting each gate as
-an e-value makes admission anytime-valid: one product certificate bounds the
-probability of ever falsely admitting a detector, under optional stopping,
-with no error budget across gates or monitoring times. A three-family exhibit
-(rolling-quantile, hidden-Markov, variance-ratio) yields cost-dominated,
-instrument-failed, and target-mismatched dispositions---failure reasons no
-performance comparison reports. Every value traces to frozen, version-pinned
+$q{=}2$---and restores size control at the declared window. That repaired
+$q{=}2$ result is retained as a \emph{superseded exploratory} record; a
+protocol-v5 successor certificate, with geometric error spending and
+repository-unseen evaluation data, replaces any post-hoc admission. Casting
+each gate as an e-value makes admission anytime-valid: one product
+certificate bounds the probability of ever falsely admitting a detector,
+under optional stopping, with no error budget across gates or monitoring
+times. A three-family exhibit (rolling-quantile, hidden-Markov,
+variance-ratio) yields incomplete, instrument-failed, and target-mismatched
+dispositions---failure reasons no performance comparison reports. The
+rolling-quantile row is incomplete because required power, size, and
+transport gates were not run; a measured negative value remains only in the
+failure profile. Every value traces to frozen, version-pinned
 artifacts, with confirmatory and exploratory provenance separated per table
 cell.
 \end{abstract}
@@ -117,9 +125,10 @@ obligation \citep{FederalReserveOCC2011}. The discipline exists elsewhere
 too: sequential changepoint detectors are \emph{designed} to declared
 operating characteristics---average run length to false alarm against
 detection delay \citep{Page1954,Lorden1971}---and Markov-switching models
-have dedicated specification tests \citep{Hamilton1996}. What is missing is
-the analogous step for regime-detector \emph{outputs used as evidence}. A
-detector---a variance-ratio cascade, a Markov-switching filter, a
+have dedicated specification tests \citep{Hamilton1996}. Gauge R\&R and ISO~5725 already characterize measurement processes before
+use \citep{NISTGaugeRR,ISO5725-1:2023}. What is missing in financial
+detector practice is the analogous \emph{joint} step for regime-detector
+\emph{outputs used as evidence}: a frozen claim whose admission requires every required gate. A detector---a variance-ratio cascade, a Markov-switching filter, a
 volatility-quantile rule, a machine-learned classifier---converts a noisy
 market history into labels, triggers, and statistics, and those outputs are
 then used directly: as conditioning variables in asset-pricing regressions, as
@@ -439,6 +448,9 @@ disposition is \emph{instrument-failed} and no statistical gate is
 interpreted.
 \item \emph{Target eligibility}: if the detector measures a different object
 than the claim target, the disposition is \emph{target-mismatched}.
+\item \emph{Completeness}: if any required gate is missing or not run, the
+disposition is \emph{incomplete}, even when a measured gate has already
+failed. Observed failures remain in the failure profile.
 \item \emph{Size}: if empirical false-alarm behavior is inconsistent with the
 declared level (in either direction), the disposition is
 \emph{size-distorted}.
@@ -446,15 +458,15 @@ declared level (in either direction), the disposition is
 not certified, the disposition is \emph{transport-uncertified}.
 \item \emph{Power}: if $\Pdet$ does not reach the required level on the
 declared amplitude family, the disposition is \emph{underpowered}.
-\item \emph{Information/value}: if $I_D$ is statistically unsupported or
-$W_D\le0$ under the declared convention, the disposition is
-\emph{cost-dominated}.
+\item \emph{Information}: if $I_D$ is statistically unsupported under the
+stationary-block reference, the disposition is
+\emph{information-unsupported}.
+\item \emph{Value}: if $W_D\le0$ under the declared convention, the
+disposition is \emph{value-negative}.
 \end{enumerate}
-Missing required estimands yield \emph{incomplete} unless the available
-evidence already fails a gate above, in which case that gate's disposition is
-reported and the missing coverage is recorded in the failure profile. When
-several gates fail, the certificate reports the first failure in this order
-and retains the rest in the profile. Every disposition in this paper,
+When several measured gates fail and every required gate is present, the
+certificate reports the first failure in this order and retains the rest in
+the profile. Every disposition in this paper,
 including the exhibits of Sections~\ref{sec:empirical}
 and~\ref{sec:families}, is generated by this rule. ``Admissible'' always
 means admissible \emph{for this claim tuple}---never profitable, never
@@ -1145,8 +1157,7 @@ real but convention-dependently valued. Each statement is bounded,
 artifact-backed, and independently actionable---and the next subsection acts
 on the first of them.
 
-\subsection{The diagnosis is actionable: recentering and the first admissible
-certificate}
+\subsection{The diagnosis is actionable: recentering as a superseded exploratory record}
 \label{sec:repair}
 
 A certificate that only ever refuses is of limited use; the test of the
@@ -1229,39 +1240,28 @@ short-horizon serial dependence above $\delta=0.02$ with demonstrated power,
 converting an uninterpretable non-result into a bounded, severe negative
 result in the sense of \citet{Mayo2018}.
 
-% AUTHOR DECISION REQUIRED (2026-08-01). Under the preregistered margin
-% eps_g = 0.019748, the q=2 clock--intrinsic pair no longer certifies
-% (Holm 0.0682). The transport gate for this scoped claim is therefore
-% partially met, not fully met, and the disposition below must be settled
-% deliberately: either (a) narrow the certificate's declared scheme scope to
-% calendar-and-volume bars, keeping "admissible" within that narrower scope,
-% or (b) demote the disposition to transport-uncertified. The text below
-% takes (a) and says so explicitly. See prereg/DEVIATIONS.md D1.
 For the scoped scientific claim---positive short-horizon ($q{=}2$) serial
 dependence on calendar bars, without an economic target---the repaired
-instrument clears size (OOS $0.02$) and power ($\mathrm{cMDE}=0.02$), and
-carries a transport gate that is met between calendar and volume bars but not
-between calendar and event-time bars, where the preregistered margin leaves
-the pair uncertified (Holm $0.0682$, Table~\ref{tab:transport}). Its
-disposition is therefore \textbf{admissible for the calendar-and-volume scheme
-scope}---the protocol's first admission---with event-time transport explicitly
-outside the certified scope rather than quietly folded into it. This is a
-narrower admission than a fully transport-certified one would be, and the
-narrowing is recorded rather than absorbed:
-Table~\ref{tab:cert-admissible} exhibits the completed certificate. Two
-properties of this admission deserve emphasis. It was reached by repairing a
-diagnosed fault, not by relaxing a gate: the recentering is the standard
-empirical-null calibration the size gate itself prescribed. And admissible
-does not mean the market claim is affirmed---here the admitted certificate
-records a powered \emph{exclusion}, which is precisely the kind of credible
-negative result that certification exists to license.
+instrument cleared size (OOS $0.02$) and power ($\mathrm{cMDE}=0.02$) on the
+original evaluation span, with transport met between calendar and volume bars
+but not between calendar and event-time bars (Holm $0.0682$,
+Table~\ref{tab:transport}). Under protocol~v5 that record is
+\textbf{superseded exploratory}: the post-freeze recentering consumed an
+unallocated look at the same evidence, so it cannot remain an admission.
+Table~\ref{tab:cert-admissible} retains the historical certificate for
+lineage. The confirmatory successor freezes the same claim tuple, calendar
+and volume bars only, the existing recentering constants, transport margin
+$0.019748$, and first evidentiary allocation $\alpha_0=0.025$, and is
+evaluated on repository-unseen BTCUSDT from 2026-06-01 through 2026-07-31.
+Admission, if it occurs, is produced only by that successor.
 
 \begin{table}[htbp]
 \centering
 \begin{threeparttable}
-\caption{First admissible certificate: recentered VR trigger, scoped claim
-(positive $q{=}2$ serial dependence, calendar bars, scientific target,
-BTCUSDT \dataspan).}
+\caption{Historical repaired VR certificate, now superseded exploratory
+(positive $q{=}2$ serial dependence, calendar and volume bars, scientific
+target, BTCUSDT \dataspan). Protocol-v5 admission is reserved for the
+confirmatory successor.}
 \label{tab:cert-admissible}
 \small
 \begin{tabularx}{\textwidth}{@{}lX@{}}
@@ -1308,10 +1308,11 @@ $10$\,\bps).}
  & Rolling quantile & Hidden Markov & VR cascade \\
 \midrule
 Validity & Valid (occupancy $0.804/0.196$; per-state non-overlap counts pass) & \emph{Instrument-failed}: state 0 occupies 59 of $89{,}222$ bars ($0.07\%$); non-overlap count below frozen floor & Target gate: serial-dependence instrument, \emph{target-mismatched} for a common volatility-state headline \\
-Information ($I_D$, nats) & $5.03\times10^{-4}$ [$3.47$, $6.66$]$\times10^{-4}$; perm.\ $p=0.005$ & Not interpreted (validity failed) & Not interpreted for this target \\
-Net value & Gross $5.03$\,\bps\ $-$ $10$\,\bps\ $= -4.97$\,\bps: \emph{cost-dominated}. State label is always-on, so per-epoch and per-trigger conventions coincide & --- & --- \\
-Missing gates & Power, size, transport not measured for this family & --- & (Certified separately in Section~\ref{sec:empirical}) \\
-Disposition & \emph{Cost-dominated} (gate 6 fails on measured evidence, so the missing-estimand fallback does not apply; incomplete power/size/transport coverage recorded in the profile) & \emph{Instrument-failed} (gate 1: read before any statistical gate) & \emph{Target-mismatched} (gate 2) for this claim \\
+Information ($I_D$, nats) & Exhibit only; permutation $p$ is
+\texttt{legacy\_noncertificate} and is not used for disposition & Not interpreted (validity failed) & Not interpreted for this target \\
+Net value & Observed $W_D=-4.97$\,\bps\ retained in the failure profile only; not a disposition & --- & --- \\
+Missing gates & Power, size, transport, and certificate-grade information not measured for this family & --- & (Certified separately in Section~\ref{sec:empirical}) \\
+Disposition & \emph{Incomplete} (required gates missing; observed value failure retained in the profile) & \emph{Instrument-failed} (gate 1: read before any statistical gate) & \emph{Target-mismatched} (gate 2) for this claim \\
 \bottomrule
 \end{tabularx}
 \begin{tablenotes}\footnotesize
@@ -1332,15 +1333,17 @@ bars) is an instrument failure to be reported \emph{before} any information
 or agreement number is interpreted---and it is a repairable fit (constrained
 re-estimation or a longer window would likely populate both states), not a
 data point about hidden-Markov models in general. The rolling-quantile
-detector shows the intermediate state the rule produces when evidence is
-partial: its measured value gate fails ($W_D=-4.97$\,\bps), so the
-disposition is \emph{cost-dominated} on measured evidence, while the
-unmeasured power, size, and transport gates are recorded as missing coverage
-rather than silently extrapolated. The cascade's exclusion from a
-volatility-state headline is target eligibility, not failure. A leaderboard
-over these three streams would have converted an instrument failure, a
-target mismatch, and a cost-dominated value gate into a performance ranking;
-the protocol instead reports each for what it is.
+detector shows the completeness rule working as designed: required power,
+size, and transport gates were not run, so the disposition is
+\emph{incomplete} even though a negative value was observed. That negative
+value remains in the failure profile and is not promoted to a
+cost-dominated or value-negative certificate. Unmeasured power, size, and
+transport gates are recorded as missing coverage rather than silently
+extrapolated. The cascade's exclusion from a volatility-state headline is
+target eligibility, not failure. A leaderboard over these three streams would
+have converted an instrument failure, a target mismatch, and an incomplete
+value observation into a performance ranking; the protocol instead reports
+each for what it is.
 
 \section{What Certification Changes in Practice}
 \label{sec:discussion}
@@ -1459,12 +1462,13 @@ conservative direction; a preregistered 96-cell grid shows the cascade
 cannot detect departures at any amplitude up to $0.10$, with the response
 threshold bracketed at $(0.10,0.15]$ at $q{=}2$ and $(0.20,0.30]$ at
 $q{=}5$; labels transport across calendar, volume, and event-time bars at
-$q{=}2$ but not at the primary horizon; and trigger information, resolvable
-at $q{=}5$, has a net value whose sign depends on a cost-attribution
-convention that the certificate therefore freezes and discloses. A
-three-family exhibit shows the same protocol returning instrument-failed,
-target-mismatched, and cost-dominated dispositions rather than a
-leaderboard.
+$q{=}2$ but not at the primary horizon; and trigger information, under a
+legacy permutation reference now superseded by stationary-block inference,
+has a net value whose sign depends on a cost-attribution convention that the
+certificate therefore freezes and discloses. A three-family exhibit shows the
+same protocol returning instrument-failed, target-mismatched, and incomplete
+dispositions rather than a leaderboard. The EUR/USD rolling-quantile
+certificate is the second asset-class demonstration of the full conjunction.
 
 None of this is a verdict on Bitcoin's efficiency, on variance-ratio tests,
 or on any trading strategy. It is a worked template for a validation step
