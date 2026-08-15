@@ -616,6 +616,7 @@ def build_evidence(
             "ci": list(value_ci),
             "mean_cost": float(np.mean(costs)),
             "gamma": float(spec.thresholds["gamma"]),
+            "n_boot": n_value_boot,
         },
         "gate_results": [gate.model_dump(mode="json") for gate in gate_results],
     }
