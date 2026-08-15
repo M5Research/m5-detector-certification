@@ -66,13 +66,16 @@ The manuscript uses repository-local artifacts only.
 | Native-frequency benchmark | `backtest_results/harmonized_benchmark/harmonized_benchmark_q4_2022_btc_minimal_hmm.json` |
 | Online sequential replay | `backtest_results/online_gcde/online_gcde_replay.json` |
 | EURUSD cost-gate sample | `backtest_results/eurusd/eurusd_histdata_cost_gate_matched_20210529_20251231_summary.json` |
+| Protocol-v5 BTC successor | `evidence/gates/btcusdt-vr-q2-v5-r0/evidence.json`; `certificates/btcusdt-vr-q2-v5-r0.json` |
+| Protocol-v5 EUR/USD certificate | `evidence/gates/eurusd-rq-v5-r0/evidence.json`; `certificates/eurusd-rq-v5-r0.json` |
+| Certificate ancestry | `provenance/certificate-lineage.json` |
 
 ## Verification Tests
 
 Run the focused artifact/test suite from the repository root:
 
 ```powershell
-python -m pytest tests/wp1/test_phase15_artifact_gate.py tests/wp1/test_empirical_vr_null.py tests/wp1/test_gauge_invariance.py tests/wp1/test_thermodynamic_bound.py tests/wp1/test_holdout_confirmatory.py tests/wp1/test_eth_replication.py tests/wp1/test_harmonized_benchmark.py tests/wp1/test_vr_detector_mi.py tests/wp1/test_histdata_eurusd.py tests/wp1/test_eurusd_cost_gate_summary.py tests/wp1/test_online_gcde.py
+python -m pytest tests/wp1/test_protocol_v5_artifacts.py tests/wp1/test_certificate_lineage.py tests/wp1/test_stationary_block_information.py tests/wp1/test_phase15_artifact_gate.py tests/wp1/test_empirical_vr_null.py tests/wp1/test_gauge_invariance.py tests/wp1/test_thermodynamic_bound.py tests/wp1/test_holdout_confirmatory.py tests/wp1/test_eth_replication.py tests/wp1/test_harmonized_benchmark.py tests/wp1/test_vr_detector_mi.py tests/wp1/test_histdata_eurusd.py tests/wp1/test_eurusd_cost_gate_summary.py tests/wp1/test_online_gcde.py
 ```
 
 These tests check artifact shape, provenance expectations, and gate-specific helper behavior. They do not replace high-resolution GCDE deployment certification.
@@ -93,7 +96,24 @@ python scripts/wp1/harmonized_benchmark.py --out backtest_results/harmonized_ben
 python scripts/wp1/online_gcde.py --npz data/injection_runs/precomputed.npz --mode both --start 2021-06-01 --end 2025-12-31 --window-days 60 --stride-days 7 --demo-cell 120:2 --real-cell 120:5 --demo-delta 0.15 --sequential-control maxT --n-boot 4999 --n-mc 500 --n-perm 2000 --out backtest_results/online_gcde/online_gcde_replay.json
 ```
 
-For production GCDE certificates, increase the null bootstrap count to the pre-declared Monte Carlo precision target and extend the real benchmark to the full declared detector set. EURUSD robustness should use HistData Generic ASCII tick bid/ask files, not FRED or ECB daily reference rates, because daily reference series do not carry an executable spread for the GCDE cost gate.
+Protocol-v5 certificate regeneration uses the immutable specification snapshots and
+full frozen resampling budgets:
+
+```powershell
+python -m scripts.wp1.btc_successor --spec specs/btcusdt-vr-q2-v5-r0.json --out evidence/rebuild/btc-evidence.json --information-dir evidence/rebuild/btc-information
+python -m scripts.wp1.run_certificate --spec specs/btcusdt-vr-q2-v5-r0.json --out certificates/btcusdt-vr-q2-v5-r0-rebuild.json
+python -m scripts.wp1.eurusd_certificate --spec specs/eurusd-rq-v5-r0.json --out evidence/rebuild/eurusd-evidence.json
+python -m scripts.wp1.run_certificate --spec specs/eurusd-rq-v5-r0.json --out certificates/eurusd-rq-v5-r0-rebuild.json
+```
+
+The runner is create-only: use a fresh output path for an independent regeneration.
+It refuses unfrozen or chronologically invalid specifications and never overwrites an
+issued certificate.
+
+The commands above default to the pre-declared production budgets: size 10,000, power
+2,000 per frozen amplitude, information/value 49,999, and transport 9,999. HistData
+Generic ASCII tick bid/ask files are required for EUR/USD; FRED or ECB daily reference
+rates do not carry an executable spread for the value gate.
 
 The ETHUSDT replication expects local Binance USD-M parquet partitions under `data/binance_futures/symbol=ETHUSDT/year=YYYY/part-0.parquet`. The driver keeps 2026 data out of the in-sample layers and loads the matched partial 2026 block only inside the replication holdout section. The BTC injection grid is not reused as an ETH calibration surface.
 
@@ -115,6 +135,10 @@ python scripts/wp1/online_gcde.py --mode both --smoke --n-boot 19 --n-mc 20 --n-
 
 ## Claim Boundary
 
-The manuscript claims a new method: the GCDE admissibility operator for detector-output claims. It does not claim Bitcoin inefficiency, trading profitability, detector optimality, or a completed detector-specific economic admissibility certificate.
+The manuscript claims an executable end-to-end certification framework for frozen
+detector-output claims. It includes two complete protocol-v5 records, but neither is
+admissible: BTC is `target_mismatched` and EUR/USD is `size_distorted`. It does not claim
+Bitcoin inefficiency, trading profitability, detector optimality, or scope beyond those
+frozen claim tuples.
 
 For exact claim status, use `CLAIM_TRACEABILITY.md` before editing the manuscript.
