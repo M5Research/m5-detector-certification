@@ -1,0 +1,68 @@
+{
+  "artifact": "btc_vr_stationary_block_information",
+  "created_at": "2026-08-15T09:27:45Z",
+  "data_hashes": {
+    "BTCUSDT-1m-2026-06.csv": "76141078aba500c43c34d841d262eb0b29141b3e183798cee56f25c1c3549e55",
+    "BTCUSDT-1m-2026-07.csv": "17327a92ca037d811cd9f96eb6622fcd959e4a860c9c78d48b69379cd9a416ee",
+    "vendor_manifest": "b4f8b053ed8b5c7378759626a2fa0cfdcdb0dce6f8eee31e89abd03d3ccfa2a9"
+  },
+  "preregistration_commit": "514759f9f78569e167843fa3fde461db7075c8d0",
+  "result": {
+    "alpha": 0.025,
+    "ci": [
+      0.0,
+      0.005336284704735402
+    ],
+    "confidence_level": 0.975,
+    "e_value": 0.8009077827960823,
+    "e_value_threshold": 40.0,
+    "gate_state": "fail",
+    "mean_block": 10,
+    "miller_madow_mi": 0.0011555110727020077,
+    "n": 731,
+    "n_boot": 49999,
+    "n_decision_epochs": 731,
+    "n_triggers": 4,
+    "p_value": 0.38974,
+    "plugin_mi": 0.000471516544658232,
+    "q": 2,
+    "reason": "stationary-block e-value below revision threshold",
+    "reference": "stationary_block",
+    "seed_derivation": "sha256(spec_hash || NUL || domain_label)",
+    "sensitivity": {
+      "double": {
+        "ci": [
+          0.0,
+          0.005252420859940618
+        ],
+        "confidence_level": 0.975,
+        "mean_block": 20,
+        "miller_madow_mi": 0.0011555110727020077,
+        "n": 731,
+        "n_boot": 49999,
+        "p_value": 0.39046,
+        "plugin_mi": 0.000471516544658232
+      },
+      "half": {
+        "ci": [
+          0.0,
+          0.005336284704735402
+        ],
+        "confidence_level": 0.975,
+        "mean_block": 5,
+        "miller_madow_mi": 0.0011555110727020077,
+        "n": 731,
+        "n_boot": 49999,
+        "p_value": 0.38684,
+        "plugin_mi": 0.000471516544658232
+      }
+    },
+    "sensitivity_e_values": {
+      "double": 0.8001690135453763,
+      "half": 0.8039042358848352
+    },
+    "trigger_rate": 0.005471956224350205
+  },
+  "schema_version": 1,
+  "spec_hash": "26052a49a467a582dbb855612b3c5f5839a858f2fc8621a33ca2702e8c508964"
+}
