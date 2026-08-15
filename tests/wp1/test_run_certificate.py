@@ -389,3 +389,25 @@ def test_cli_dispatches_registered_gate_workflow(
 
     assert cli_module.main(["--spec", str(spec_path), "--out", str(out_path)]) == 0
     assert captured["gate_results"] == _pass_gates()
+
+
+def test_builtin_btc_workflow_loads_only_frozen_repository_evidence(tmp_path: Path) -> None:
+    from certificate.gates import evaluate_gates
+
+    spec = CertificateSpec.model_validate(_spec_dict(certificate_id="btc-workflow-fixture"))
+    spec.detector = "btc_vr_recentered_q2"
+    artifact = tmp_path / "evidence" / "gates" / spec.certificate_id / "evidence.json"
+    artifact.parent.mkdir(parents=True)
+    gates = [
+        {
+            "gate": gate,
+            "state": "pass",
+            "artifacts": [f"evidence/gates/{spec.certificate_id}/evidence.json"],
+        }
+        for gate in spec.required_gates
+    ]
+    artifact.write_text(json.dumps({"gate_results": gates}), encoding="utf-8")
+
+    loaded = evaluate_gates(spec, tmp_path)
+
+    assert [gate.gate for gate in loaded] == spec.required_gates

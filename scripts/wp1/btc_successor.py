@@ -410,6 +410,13 @@ def build_evidence(
     }
 
 
+def load_gate_results(spec: CertificateSpec, repo: Path) -> list[GateResult]:
+    """Load immutable evidence; certificate aggregation never recomputes gates."""
+    path = repo / "evidence" / "gates" / spec.certificate_id / "evidence.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return [GateResult.model_validate(row) for row in payload["gate_results"]]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--spec", type=Path, required=True)
