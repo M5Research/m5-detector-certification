@@ -8,11 +8,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import io
+import json
 import re
 import zipfile
 from collections.abc import Iterable, Iterator
-from datetime import datetime
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote
 
@@ -24,6 +26,7 @@ from urllib.parse import quote
 DEFAULT_SYMBOL = "EURUSD"
 DEFAULT_OUT_DIR = Path("data/external/histdata/EURUSD/tick")
 HISTDATA_BASE = "https://www.histdata.com/download-free-forex-data/"
+HISTDATA_TZ = timezone(timedelta(hours=-5), name="EST")
 
 
 def histdata_download_page_url(symbol: str, year: int, month: int) -> str:
@@ -45,12 +48,12 @@ def _parse_tick_line(raw: str) -> dict[str, float | str] | None:
     stamp = parts[0]
     bid = float(parts[1])
     ask = float(parts[2])
-    if ask < bid:
-        raise ValueError(f"ask must be >= bid for {stamp}")
+    if bid <= 0.0 or ask < bid:
+        raise ValueError(f"quotes must satisfy ask >= bid > 0 for {stamp}")
     volume = float(parts[3]) if len(parts) >= 4 and parts[3] else 0.0
-    dt = _parse_histdata_timestamp(stamp)
+    dt = _parse_histdata_timestamp(stamp).replace(tzinfo=HISTDATA_TZ).astimezone(UTC)
     return {
-        "timestamp": dt.isoformat(timespec="microseconds"),
+        "timestamp": dt.isoformat(timespec="microseconds").replace("+00:00", "Z"),
         "bid": bid,
         "ask": ask,
         "spread": ask - bid,
@@ -105,7 +108,7 @@ def aggregate_tick_rows_to_minutes(
         if parsed is None:
             continue
         parsed_count += 1
-        minute = str(parsed["timestamp"])[:16] + ":00.000000"
+        minute = str(parsed["timestamp"])[:16] + ":00.000000Z"
         if current_minute is None:
             current_minute = minute
             n_ticks = 0
@@ -166,20 +169,18 @@ def _iter_first_csv(zip_bytes: bytes) -> Iterator[str]:
                 yield line.decode("utf-8", errors="replace")
 
 
-def download_month(
+def download_month_archive(
     symbol: str,
     year: int,
     month: int,
     timeout: int = 60,
-    max_rows: int | None = None,
-    aggregate: str = "tick",
-) -> list[dict[str, float | str | int]]:
-    """Download and parse one HistData Generic ASCII tick month."""
+) -> bytes:
+    """Download one immutable HistData vendor archive."""
     try:
         import requests
     except ModuleNotFoundError as exc:  # pragma: no cover - install-path guard
         raise ModuleNotFoundError(
-            "download_month() needs the optional 'download' extra: "
+            "download_month_archive() needs the optional 'download' extra: "
             'pip install -e ".[download]"'
         ) from exc
 
@@ -197,7 +198,17 @@ def download_month(
         response.raise_for_status()
     if not response.content.startswith(b"PK"):
         raise ValueError("HistData download response was not a zip file")
-    lines = _iter_first_csv(response.content)
+    return response.content
+
+
+def parse_month_archive(
+    zip_bytes: bytes,
+    *,
+    max_rows: int | None = None,
+    aggregate: str = "tick",
+) -> list[dict[str, float | str | int]]:
+    """Parse one HistData Generic ASCII tick archive."""
+    lines = _iter_first_csv(zip_bytes)
     if aggregate == "tick":
         rows = parse_tick_csv_lines(lines, max_rows=max_rows)
     elif aggregate == "minute":
@@ -205,8 +216,21 @@ def download_month(
     else:
         raise ValueError("aggregate must be 'tick' or 'minute'")
     if not rows:
-        raise ValueError(f"HistData returned no rows for {symbol} {year}-{month:02d}")
+        raise ValueError("HistData archive contained no parseable rows")
     return rows
+
+
+def download_month(
+    symbol: str,
+    year: int,
+    month: int,
+    timeout: int = 60,
+    max_rows: int | None = None,
+    aggregate: str = "tick",
+) -> list[dict[str, float | str | int]]:
+    """Download and parse one HistData Generic ASCII tick month."""
+    archive = download_month_archive(symbol, year, month, timeout)
+    return parse_month_archive(archive, max_rows=max_rows, aggregate=aggregate)
 
 
 def write_rows_csv(rows: list[dict[str, float | str | int]], out_path: Path) -> None:
@@ -218,6 +242,63 @@ def write_rows_csv(rows: list[dict[str, float | str | int]], out_path: Path) -> 
         writer.writerows(rows)
 
 
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_normalized_csv(path: Path) -> dict[str, object]:
+    """Validate one normalized minute partition without loading it wholesale."""
+    previous: datetime | None = None
+    seen: set[str] = set()
+    duplicates = 0
+    monotonic = True
+    quotes_valid = True
+    rows = 0
+    ticks = 0
+    first: str | None = None
+    last: str | None = None
+    weekend_rows = 0
+    max_gap_minutes = 0.0
+    with path.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            stamp = row["timestamp"]
+            current = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+            if current.tzinfo is None or current.utcoffset() != timedelta(0):
+                monotonic = False
+            if previous is not None:
+                if current <= previous:
+                    monotonic = False
+                max_gap_minutes = max(max_gap_minutes, (current - previous).total_seconds() / 60)
+            previous = current
+            if stamp in seen:
+                duplicates += 1
+            seen.add(stamp)
+            bid, ask = float(row["bid"]), float(row["ask"])
+            quotes_valid &= bid > 0.0 and ask >= bid
+            rows += 1
+            ticks += int(row.get("n_ticks", 1))
+            weekend_rows += int(current.weekday() >= 5)
+            first = first or stamp
+            last = stamp
+    return {
+        "path": path.as_posix(),
+        "sha256": _sha256(path),
+        "row_count": rows,
+        "tick_count": ticks,
+        "first_timestamp": first,
+        "last_timestamp": last,
+        "monotonic_utc": monotonic,
+        "ask_gte_bid_positive": quotes_valid,
+        "duplicate_timestamps": duplicates,
+        "weekend_rows": weekend_rows,
+        "max_gap_minutes": max_gap_minutes,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--symbol", default=DEFAULT_SYMBOL)
@@ -226,13 +307,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--max-rows", type=int, default=None)
     parser.add_argument("--aggregate", choices=["tick", "minute"], default="tick")
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        help="optional compact JSON manifest containing vendor and normalized hashes",
+    )
     args = parser.parse_args(argv)
 
+    reports: list[dict[str, object]] = []
     for month in args.months:
-        rows = download_month(
-            args.symbol,
-            args.year,
-            month,
+        archive = download_month_archive(args.symbol, args.year, month)
+        raw_path = args.out_dir / "raw" / f"{args.symbol.upper()}_{args.year}_{month:02d}_tick.zip"
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+        raw_path.write_bytes(archive)
+        rows = parse_month_archive(
+            archive,
             max_rows=args.max_rows,
             aggregate=args.aggregate,
         )
@@ -240,6 +329,23 @@ def main(argv: list[str] | None = None) -> int:
         out_path = args.out_dir / f"{args.symbol.upper()}_{args.year}_{month:02d}_{suffix}.csv"
         write_rows_csv(rows, out_path)
         print(f"Wrote {out_path} ({len(rows)} rows)")
+        report = validate_normalized_csv(out_path)
+        report.update(
+            {
+                "source_url": histdata_download_page_url(args.symbol, args.year, month),
+                "raw_path": raw_path.as_posix(),
+                "raw_sha256": _sha256(raw_path),
+                "raw_bytes": raw_path.stat().st_size,
+            }
+        )
+        reports.append(report)
+    if args.manifest:
+        args.manifest.parent.mkdir(parents=True, exist_ok=True)
+        args.manifest.write_text(
+            json.dumps({"source": "HistData Generic ASCII tick", "partitions": reports}, indent=2)
+            + "\n",
+            encoding="utf-8",
+        )
     return 0
 
 

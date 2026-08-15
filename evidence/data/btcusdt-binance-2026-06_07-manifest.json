@@ -1,0 +1,29 @@
+{
+  "source": "Binance USD-M public data archive",
+  "instrument": "BTCUSDT",
+  "interval": "1m",
+  "partitions": [
+    {
+      "source_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2026-06.zip",
+      "raw_path": "data/external/binance/BTCUSDT/1m/BTCUSDT-1m-2026-06.zip",
+      "raw_sha256": "9b214199eb5063585c7ed0f59ba19323326d68ac024b85106713989399204490",
+      "vendor_checksum_verified": true,
+      "normalized_path": "data/external/binance/BTCUSDT/1m/BTCUSDT-1m-2026-06.csv",
+      "normalized_sha256": "76141078aba500c43c34d841d262eb0b29141b3e183798cee56f25c1c3549e55",
+      "row_count": 43200,
+      "first_timestamp": 1780272000000,
+      "last_timestamp": 1782863940000
+    },
+    {
+      "source_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2026-07.zip",
+      "raw_path": "data/external/binance/BTCUSDT/1m/BTCUSDT-1m-2026-07.zip",
+      "raw_sha256": "f18440bb58f0c7e1ff63cbb906132002877c4914540c8aebab920da6937cff73",
+      "vendor_checksum_verified": true,
+      "normalized_path": "data/external/binance/BTCUSDT/1m/BTCUSDT-1m-2026-07.csv",
+      "normalized_sha256": "17327a92ca037d811cd9f96eb6622fcd959e4a860c9c78d48b69379cd9a416ee",
+      "row_count": 44640,
+      "first_timestamp": 1782864000000,
+      "last_timestamp": 1785542340000
+    }
+  ]
+}

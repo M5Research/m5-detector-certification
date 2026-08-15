@@ -24,7 +24,7 @@ def test_parse_histdata_tick_csv_requires_bid_and_ask() -> None:
 
     rows = parse_tick_csv_lines(["20221003 000000000,0.98000,0.98012,0"])
 
-    assert rows[0]["timestamp"] == "2022-10-03T00:00:00.000000"
+    assert rows[0]["timestamp"] == "2022-10-03T05:00:00.000000Z"
     assert rows[0]["bid"] == 0.98
     assert rows[0]["ask"] == 0.98012
     assert rows[0]["spread"] > 0.0
@@ -42,11 +42,48 @@ def test_aggregate_tick_rows_to_minutes_keeps_last_quote_spread() -> None:
     )
 
     assert len(rows) == 2
-    assert rows[0]["timestamp"] == "2022-10-03T00:00:00.000000"
+    assert rows[0]["timestamp"] == "2022-10-03T05:00:00.000000Z"
     assert rows[0]["bid"] == 0.98002
     assert rows[0]["ask"] == 0.98015
     assert rows[0]["n_ticks"] == 2
-    assert rows[1]["timestamp"] == "2022-10-03T00:01:00.000000"
+    assert rows[1]["timestamp"] == "2022-10-03T05:01:00.000000Z"
+
+
+def test_validate_normalized_rows_reports_integrity_and_hash(tmp_path: Path) -> None:
+    from scripts.wp1.download_histdata_eurusd import (
+        validate_normalized_csv,
+        write_rows_csv,
+    )
+
+    path = tmp_path / "EURUSD_2022_10_m1_bidask.csv"
+    rows = [
+        {
+            "timestamp": "2022-10-03T05:00:00.000000Z",
+            "bid": 0.98,
+            "ask": 0.9801,
+            "spread": 0.0001,
+            "mid": 0.98005,
+            "n_ticks": 2,
+        },
+        {
+            "timestamp": "2022-10-03T05:01:00.000000Z",
+            "bid": 0.9802,
+            "ask": 0.9803,
+            "spread": 0.0001,
+            "mid": 0.98025,
+            "n_ticks": 3,
+        },
+    ]
+    write_rows_csv(rows, path)
+
+    report = validate_normalized_csv(path)
+
+    assert report["monotonic_utc"] is True
+    assert report["ask_gte_bid_positive"] is True
+    assert report["duplicate_timestamps"] == 0
+    assert report["row_count"] == 2
+    assert report["tick_count"] == 5
+    assert len(report["sha256"]) == 64
 
 
 def test_extract_download_payload_from_histdata_final_page() -> None:
